@@ -1,0 +1,119 @@
+{
+  "date": "2026-06-04",
+  "overallState": "no_go_production_final_qa_open",
+  "states": [
+    {
+      "id": "QA-STATE-001",
+      "severity": "critical",
+      "status": "fixed",
+      "title": "MySQL migration chain fails",
+      "area": "backend/database",
+      "fixedBy": [
+        "003_mysql_data_hardening.sql",
+        "004_admin_notifications_engine.sql",
+        "005_native_auth_deferred_verification.sql",
+        "006_submission_payment_method_validation.sql",
+        "007_submission_structured_fields_backfill.sql",
+        "008_legacy_submission_form_data_nullable.sql"
+      ]
+    },
+    {
+      "id": "QA-STATE-002",
+      "severity": "critical",
+      "status": "fixed",
+      "title": "Register endpoint fails because users table is missing",
+      "area": "backend/auth",
+      "evidence": [
+        "register:201",
+        "login:200"
+      ]
+    },
+    {
+      "id": "QA-STATE-003",
+      "severity": "high",
+      "status": "fixed",
+      "title": "Local QA database is stale",
+      "area": "qa/database",
+      "evidence": [
+        "schema_migrations:001-008",
+        "country_taxonomy:4",
+        "area_city_taxonomy:13"
+      ]
+    },
+    {
+      "id": "QA-STATE-004",
+      "severity": "medium",
+      "status": "fixed_for_local_qa_docs",
+      "title": "Production readiness environment variables missing by default",
+      "area": "environment",
+      "evidence": [
+        ".env.example updated",
+        "backend/.env.example updated",
+        "qa-tester/02_QA_ENV_SETUP.md added"
+      ]
+    },
+    {
+      "id": "QA-STATE-005",
+      "severity": "high",
+      "status": "smoke_verified",
+      "title": "Full user journey not yet verified",
+      "area": "end-to-end",
+      "evidence": [
+        "register:201",
+        "login:200",
+        "interest:201",
+        "availability:201",
+        "verification_submit:202",
+        "non_privileged_admin_review:403",
+        "compliance_approval:200",
+        "admin_actions_audit_row:present"
+      ],
+      "followUp": [
+        "seeded matching ranking QA"
+      ]
+    },
+    {
+      "id": "QA-STATE-006",
+      "severity": "critical",
+      "status": "open",
+      "title": "Production final QA is not complete",
+      "area": "production-readiness",
+      "evidence": [
+        "qa-tester/05_FINAL_QA_PRODUCTION_READINESS_CHECKLIST.md",
+        "qa-tester/06_PRODUCTION_EMPTY_ENV_TEMPLATE.md",
+        "qa-tester/07_FINAL_QA_EXECUTION_REPORT.md",
+        "qa:readiness:strict 34/40 because env values are missing",
+        ".env.production.example"
+      ],
+      "followUp": [
+        "Configure real production/staging env values and remote URLs.",
+        "Run browser E2E for user and admin role journeys.",
+        "Run signed upload, matching/ranking, migration/backup, and final security QA."
+      ]
+    }
+  ],
+  "passedChecks": [
+    "backend:typecheck",
+    "backend:build",
+    "mysql:migrations:clean-schema",
+    "mysql:migrations:active-qa-schema",
+    "auth:register-login-smoke",
+    "submission:interest-smoke",
+    "submission:availability-smoke",
+    "verification:user-submit-smoke",
+    "verification:admin-compliance-approval-smoke",
+    "admin:non-compliance-denied",
+    "dashboard:qa:permissions",
+    "dashboard:typecheck",
+    "dashboard:build",
+    "website:typecheck",
+    "website:build",
+    "qa:readiness:strict-with-local-env"
+  ],
+  "followUp": [
+    "Run a dedicated seeded-data matching-quality QA pass.",
+    "Fill staging/production environment variables and remote URLs.",
+    "Run strict readiness until 40/40 passes.",
+    "Run final browser E2E, signed upload, seeded matching, migration/backup, and security QA."
+  ]
+}

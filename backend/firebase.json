@@ -1,0 +1,19 @@
+{
+  "functions": {
+    "source": ".",
+    "runtime": "nodejs20",
+    "ignore": [
+      "node_modules",
+      "src",
+      "dist/**/*.map",
+      "db",
+      "scripts",
+      ".env",
+      ".env.*",
+      "*.local"
+    ],
+    "predeploy": [
+      "npm --prefix \"$RESOURCE_DIR\" run build"
+    ]
+  }
+}

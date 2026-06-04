@@ -1,0 +1,32 @@
+{
+  "name": "galaxy-elite-private-match-website",
+  "version": "4.0.0",
+  "private": true,
+  "description": "Galaxy Elite Private Match public website with secure submission forms, approved public boards, market pulse content, backend-authenticated member workflows, and Firebase push notification support.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "doctor": "npm run typecheck && npm run build"
+  },
+  "dependencies": {
+    "@sanity/client": "7.22.0",
+    "@supabase/ssr": "0.10.3",
+    "@supabase/supabase-js": "2.106.2",
+    "firebase": "^12.14.0",
+    "next": "16.2.6",
+    "react": "19.2.6",
+    "react-dom": "19.2.6",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.30",
+    "@types/react": "19.2.15",
+    "@types/react-dom": "^19.2.0",
+    "typescript": "^5.8.3"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

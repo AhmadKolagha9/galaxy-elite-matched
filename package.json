@@ -1,0 +1,31 @@
+{
+  "name": "galaxy-elite-private-match-ultimate",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Galaxy Elite Private Match workspace with top-level docs, the control dashboard, and a TypeScript Express backend.",
+  "scripts": {
+    "dev:backend": "npm --prefix backend run dev",
+    "build:backend": "npm --prefix backend run build",
+    "start:backend": "npm --prefix backend run start",
+    "typecheck:backend": "npm --prefix backend run typecheck",
+    "dev:website": "npm --prefix website-galaxy run dev",
+    "build:website": "npm --prefix website-galaxy run build",
+    "start:website": "npm --prefix website-galaxy run start",
+    "typecheck:website": "npm --prefix website-galaxy run typecheck",
+    "dev:dashboard": "npm --prefix dashboard-galaxy run dev",
+    "build:dashboard": "npm --prefix dashboard-galaxy run build",
+    "start:dashboard": "npm --prefix dashboard-galaxy run start",
+    "typecheck:dashboard": "npm --prefix dashboard-galaxy run typecheck",
+    "doctor": "npm run qa:all",
+    "db:mysql:up": "docker compose up -d mysql",
+    "db:mysql:down": "docker compose stop mysql",
+    "db:mysql:reset": "docker compose down -v && docker compose up -d mysql",
+    "db:mysql:status": "docker compose ps mysql",
+    "qa:readiness": "node scripts/qa-production-readiness.mjs",
+    "qa:readiness:strict": "node scripts/qa-production-readiness.mjs --strict",
+    "qa:all": "npm run typecheck:backend && npm run build:backend && npm --prefix dashboard-galaxy run qa:permissions && npm run typecheck:dashboard && npm run build:dashboard && npm run typecheck:website && npm run build:website && npm run qa:readiness"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

@@ -1,0 +1,3504 @@
+{
+  "info": {
+    "_postman_id": "27c1fb64-4b38-4c3d-9f43-galaxybackend01",
+    "name": "Galaxy Elite Private Match Backend API - Production",
+    "description": "Advanced Postman collection for the Galaxy Elite Private Match TypeScript Express backend.\n\nProduction base URL: `https://api.yourpropertymatch.cloud`.\n\nAuth model:\n- User routes use `Authorization: Bearer {{userToken}}` captured from Register/Login.\n- Admin routes use role JWT variables such as `{{adminToken}}`, `{{complianceToken}}`, or `{{superAdminToken}}`.\n- Server-to-server admin smoke tests may use `x-internal-api-key: {{internalApiKey}}` if you set it from backend `.env`.\n\nRun order suggestion:\n1. System > Health Check\n2. Auth > Register User\n3. Auth > Login User\n4. Profile > Me\n5. Submissions / Upload / Verification examples\n6. Admin routes after setting a privileged token or internal API key.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "if (!pm.environment.get('runId')) {",
+          "  pm.environment.set('runId', Date.now());",
+          "}",
+          "if (!pm.environment.get('qaPassword')) {",
+          "  pm.environment.set('qaPassword', 'PostmanQA@2026');",
+          "}",
+          "if (!pm.environment.get('userEmail')) {",
+          "  pm.environment.set('userEmail', `qa.user+${pm.environment.get('runId')}@yourpropertymatch.cloud`);",
+          "}",
+          "if (!pm.environment.get('relatedObjectId')) {",
+          "  pm.environment.set('relatedObjectId', '11111111-1111-4111-8111-111111111111');",
+          "}",
+          "if (!pm.environment.get('targetUserId')) {",
+          "  pm.environment.set('targetUserId', pm.environment.get('userId') || '11111111-1111-4111-8111-111111111111');",
+          "}",
+          "if (!pm.environment.get('submissionId')) { pm.environment.set('submissionId', '11111111-1111-4111-8111-111111111111'); }",
+          "if (!pm.environment.get('documentId')) { pm.environment.set('documentId', '11111111-1111-4111-8111-111111111111'); }",
+          "if (!pm.environment.get('matchRequestId')) { pm.environment.set('matchRequestId', '11111111-1111-4111-8111-111111111111'); }",
+          "if (!pm.environment.get('matchRoomId')) { pm.environment.set('matchRoomId', '11111111-1111-4111-8111-111111111111'); }",
+          "if (!pm.environment.get('taxonomyItemId')) { pm.environment.set('taxonomyItemId', '11111111-1111-4111-8111-111111111111'); }"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "pm.test('Response is JSON when body exists', function () {",
+          "  if (pm.response.text()) { pm.expect(pm.response.headers.get('Content-Type') || '').to.include('application/json'); }",
+          "});",
+          "pm.test('No 5xx server error', function () {",
+          "  pm.expect(pm.response.code).to.be.below(500);",
+          "});"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://api.yourpropertymatch.cloud",
+      "type": "string"
+    },
+    {
+      "key": "apiPrefix",
+      "value": "/api",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "System",
+      "description": "Root and health endpoints.",
+      "item": [
+        {
+          "name": "Root",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                ""
+              ],
+              "query": []
+            },
+            "description": "Root API health marker outside /api."
+          },
+          "response": []
+        },
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "health"
+              ],
+              "query": []
+            },
+            "description": "Backend health, DB configured flag, engine, uptime."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "description": "Native JWT registration and login. Register/Login capture `userToken`, `userId`, and `userEmail` automatically.",
+      "item": [
+        {
+          "name": "Register User - Owner",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "register"
+              ],
+              "query": []
+            },
+            "description": "Creates a native user account. Staff roles cannot self-register. Password must be at least 12 characters.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{userEmail}}\",\n  \"password\": \"{{qaPassword}}\",\n  \"full_name\": \"Postman QA Owner\",\n  \"phone\": \"+971500000001\",\n  \"primary_role\": \"owner\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('Auth response ok', function () { pm.expect(json.ok).to.eql(true); pm.expect(json.token).to.be.a('string'); });",
+                  "if (json.token) pm.environment.set('userToken', json.token);",
+                  "if (json.user && json.user.id) pm.environment.set('userId', json.user.id);",
+                  "if (json.user && json.user.email) pm.environment.set('userEmail', json.user.email);",
+                  "if (json.user && json.user.verificationStatus) pm.environment.set('verificationStatus', json.user.verificationStatus);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ],
+              "query": []
+            },
+            "description": "Logs in with `{{userEmail}}` and captures a fresh `userToken`.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{userEmail}}\",\n  \"password\": \"{{qaPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('Auth response ok', function () { pm.expect(json.ok).to.eql(true); pm.expect(json.token).to.be.a('string'); });",
+                  "if (json.token) pm.environment.set('userToken', json.token);",
+                  "if (json.user && json.user.id) pm.environment.set('userId', json.user.id);",
+                  "if (json.user && json.user.email) pm.environment.set('userEmail', json.user.email);",
+                  "if (json.user && json.user.verificationStatus) pm.environment.set('verificationStatus', json.user.verificationStatus);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Register User - Agent Example",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "register"
+              ],
+              "query": []
+            },
+            "description": "Optional additional user example. Change email if already used.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"qa.agent+{{$timestamp}}@yourpropertymatch.cloud\",\n  \"password\": \"{{qaPassword}}\",\n  \"full_name\": \"Postman QA Agent\",\n  \"phone\": \"+971500000002\",\n  \"primary_role\": \"agent\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Profile",
+      "description": "Authenticated profile helpers.",
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{userToken}}",
+            "type": "string"
+          }
+        ]
+      },
+      "item": [
+        {
+          "name": "Me",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}",
+                "disabled": false
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/profile/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "profile",
+                "me"
+              ],
+              "query": []
+            },
+            "description": "Returns the authenticated JWT principal.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{userToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Public Submissions",
+      "description": "User-facing submission APIs. Interest and availability require Bearer user token.",
+      "item": [
+        {
+          "name": "Create Interest Signal",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}",
+                "disabled": false
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/interest",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "interest"
+              ],
+              "query": []
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{userToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Postman QA buyer interest - Dubai apartment\",\n  \"availability_type\": \"Private matching only\",\n  \"listing_intent\": \"Keep private - match only\",\n  \"market_segment\": \"Residential\",\n  \"property_type\": \"Apartment / flat\",\n  \"country\": \"UAE\",\n  \"area_city\": \"Dubai\",\n  \"project_name\": \"Downtown Dubai\",\n  \"building_name\": \"Any premium tower\",\n  \"size_sqft\": 1100,\n  \"price_min\": 1000000,\n  \"price_max\": 1600000,\n  \"availability_date\": \"2026-09-01\",\n  \"privacy_level\": \"Admin only\",\n  \"private_description\": \"Buyer wants a private apartment opportunity in Dubai with verified owner authority.\",\n  \"category\": \"residential\",\n  \"offering_type\": \"sell\",\n  \"rooms\": 3,\n  \"bedrooms\": 2,\n  \"total_floors\": 40,\n  \"parking_spaces\": 1,\n  \"furnishing_type\": \"Furnished\",\n  \"project_status\": \"ready to move\",\n  \"amenities\": [\n    \"Balcony\",\n    \"security\"\n  ],\n  \"preferred_payment_method\": \"Cash\",\n  \"user_role\": \"Buyer\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json(); if (json.id) pm.environment.set('interestId', json.id); if (json.id) pm.environment.set('submissionId', json.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List Public Interest Signals",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/interest",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "interest"
+              ],
+              "query": []
+            },
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "const rows = json.records || json.records || json.rows || [];",
+                  "if (Array.isArray(rows) && rows.length && rows[0].id) pm.environment.set('interestId', rows[0].id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Private Availability",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}",
+                "disabled": false
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/availability",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "availability"
+              ],
+              "query": []
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{userToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Postman QA private availability - Downtown apartment\",\n  \"availability_type\": \"May sell privately\",\n  \"listing_intent\": \"Keep private - match only\",\n  \"market_segment\": \"Residential\",\n  \"property_type\": \"Apartment / flat\",\n  \"country\": \"UAE\",\n  \"area_city\": \"Dubai\",\n  \"project_name\": \"Downtown Dubai\",\n  \"building_name\": \"Private Tower\",\n  \"size_sqft\": 1250.5,\n  \"price_min\": 1200000,\n  \"price_max\": 1450000,\n  \"availability_date\": \"2026-08-01\",\n  \"privacy_level\": \"Matched users only\",\n  \"private_description\": \"Owner is open to a private match for a qualified buyer. Do not publish contact details.\",\n  \"category\": \"residential\",\n  \"offering_type\": \"sell\",\n  \"rooms\": 3,\n  \"bedrooms\": 2,\n  \"total_floors\": 35,\n  \"parking_spaces\": 1,\n  \"furnishing_type\": \"Furnished\",\n  \"project_status\": \"ready to move\",\n  \"amenities\": [\n    \"Balcony\",\n    \"security\",\n    \"shared Gym\"\n  ],\n  \"preferred_payment_method\": \"Cash\",\n  \"user_role\": \"Direct owner\",\n  \"authority_declaration\": \"I am the direct owner/landlord\",\n  \"verification_documents\": [\n    {\n      \"document_type\": \"title_deed\",\n      \"storage_path\": \"private/example-user/title_deed/example.pdf\",\n      \"original_filename\": \"title-deed.pdf\",\n      \"mime_type\": \"application/pdf\",\n      \"file_size\": 204800\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json(); if (json.id) pm.environment.set('availabilityId', json.id); if (json.id) pm.environment.set('submissionId', json.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Verified Listing Request",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/verified-listing",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "verified-listing"
+              ],
+              "query": []
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"submitterRole\": \"Direct owner\",\n  \"listingIntent\": \"Request verified private listing\",\n  \"marketSegment\": \"Residential\",\n  \"purpose\": \"sell\",\n  \"country\": \"UAE\",\n  \"cityArea\": \"Dubai Marina\",\n  \"propertyType\": \"Apartment / flat\",\n  \"priceRange\": \"AED 1.2M - 1.5M\",\n  \"ownershipStatus\": \"Owner\",\n  \"permitStatus\": \"Permit available on request\",\n  \"description\": \"Verified listing request created from Postman.\",\n  \"name\": \"Postman Owner\",\n  \"email\": \"owner+{{$timestamp}}@yourpropertymatch.cloud\",\n  \"phone\": \"+971500000003\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json(); if (json.id) pm.environment.set('verifiedListingId', json.id); if (json.id) pm.environment.set('submissionId', json.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List Public Verified Listings",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/verified-listing",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "verified-listing"
+              ],
+              "query": []
+            },
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "const rows = json.records || json.records || json.rows || [];",
+                  "if (Array.isArray(rows) && rows.length && rows[0].id) pm.environment.set('verifiedListingId', rows[0].id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Investor Post",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/investor-post",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "investor-post"
+              ],
+              "query": []
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"investorProfile\": \"Family office\",\n  \"investorGoal\": \"Acquire income property\",\n  \"marketSegment\": \"Investment\",\n  \"country\": \"UAE\",\n  \"cityArea\": \"Dubai\",\n  \"propertyType\": \"Investment property\",\n  \"ticketSize\": \"AED 5M - 10M\",\n  \"riskPreference\": \"Medium\",\n  \"timeline\": \"3-6 months\",\n  \"budgetVisibility\": \"Admin only\",\n  \"description\": \"Investor wants private reviewed opportunities only.\",\n  \"name\": \"Postman Investor\",\n  \"email\": \"investor+{{$timestamp}}@yourpropertymatch.cloud\",\n  \"phone\": \"+971500000004\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json(); if (json.id) pm.environment.set('investorPostId', json.id); if (json.id) pm.environment.set('submissionId', json.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List Public Investor Posts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/investor-post",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "investor-post"
+              ],
+              "query": []
+            },
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "const rows = json.records || json.records || json.rows || [];",
+                  "if (Array.isArray(rows) && rows.length && rows[0].id) pm.environment.set('investorPostId', rows[0].id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Agent Profile",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/agent",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "agent"
+              ],
+              "query": []
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Postman Agent\",\n  \"email\": \"agent+{{$timestamp}}@yourpropertymatch.cloud\",\n  \"phone\": \"+971500000005\",\n  \"company\": \"Postman Brokerage LLC\",\n  \"licenceNumber\": \"BRN-POSTMAN-001\",\n  \"country\": \"UAE\",\n  \"representation\": \"Buyer and seller representation\",\n  \"authority\": \"Licensed agent with authority\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json(); if (json.id) pm.environment.set('agentSubmissionId', json.id); if (json.id) pm.environment.set('submissionId', json.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Newsletter Signup",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/newsletter",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "newsletter"
+              ],
+              "query": []
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"newsletter+{{$timestamp}}@yourpropertymatch.cloud\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Taxonomy",
+      "description": "Public taxonomy browsing and admin taxonomy management.",
+      "item": [
+        {
+          "name": "Public Taxonomy - All",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/taxonomy",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "taxonomy"
+              ],
+              "query": []
+            },
+            "description": ""
+          },
+          "response": []
+        },
+        {
+          "name": "Public Taxonomy - Property Types UAE",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/taxonomy?type=property_type&country_scope=uae",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "taxonomy"
+              ],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "property_type",
+                  "description": "",
+                  "disabled": false
+                },
+                {
+                  "key": "country_scope",
+                  "value": "uae",
+                  "description": "",
+                  "disabled": false
+                }
+              ]
+            },
+            "description": ""
+          },
+          "response": []
+        },
+        {
+          "name": "Admin Taxonomy Tree",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}",
+                "disabled": false
+              },
+              {
+                "key": "x-internal-api-key",
+                "value": "{{internalApiKey}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/taxonomy",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "taxonomy"
+              ],
+              "query": []
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "const rows = json.items || json.items || json.rows || [];",
+                  "if (Array.isArray(rows) && rows.length && rows[0].id) pm.environment.set('taxonomyItemId', rows[0].id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "SuperAdmin Create Taxonomy Item",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{superAdminToken}}",
+                "disabled": false
+              },
+              {
+                "key": "x-internal-api-key",
+                "value": "{{internalApiKey}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/taxonomy",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "taxonomy"
+              ],
+              "query": []
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{superAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"taxonomy_type\": \"area_city\",\n  \"label\": \"Postman Test District\",\n  \"country_scope\": \"uae\",\n  \"is_active\": true,\n  \"sort_order\": 9000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json(); if (json.item && json.item.id) pm.environment.set('taxonomyItemId', json.item.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "SuperAdmin Update Taxonomy Item",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{superAdminToken}}",
+                "disabled": false
+              },
+              {
+                "key": "x-internal-api-key",
+                "value": "{{internalApiKey}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/taxonomy/{{taxonomyItemId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "taxonomy",
+                "{{taxonomyItemId}}"
+              ],
+              "query": []
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{superAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"label\": \"Postman Test District Updated\",\n  \"is_active\": true,\n  \"sort_order\": 9001\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SuperAdmin Replace Taxonomy Item",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{superAdminToken}}",
+                "disabled": false
+              },
+              {
+                "key": "x-internal-api-key",
+                "value": "{{internalApiKey}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/taxonomy/{{taxonomyItemId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "taxonomy",
+                "{{taxonomyItemId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{superAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"taxonomy_type\": \"area_city\",\n  \"label\": \"Postman Test District Replaced\",\n  \"country_scope\": \"uae\",\n  \"is_active\": true,\n  \"sort_order\": 9002\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SuperAdmin Import Taxonomy CSV",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{superAdminToken}}",
+                "disabled": false
+              },
+              {
+                "key": "x-internal-api-key",
+                "value": "{{internalApiKey}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/taxonomy/import",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "taxonomy",
+                "import"
+              ],
+              "query": []
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{superAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"csv\": \"taxonomy_type,label,country_scope,sort_order\\narea_city,Postman CSV District,uae,9010\\nproperty_type,Postman Loft,global,9011\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SuperAdmin Archive Taxonomy Item",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{superAdminToken}}",
+                "disabled": false
+              },
+              {
+                "key": "x-internal-api-key",
+                "value": "{{internalApiKey}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/taxonomy/{{taxonomyItemId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "taxonomy",
+                "{{taxonomyItemId}}"
+              ],
+              "query": []
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{superAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Uploads And Verification",
+      "description": "Private document signed URL creation and user identity verification submission.",
+      "item": [
+        {
+          "name": "Create Signed Upload URL - Owner ID",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}",
+                "disabled": false
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/upload/sign-url",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "upload",
+                "sign-url"
+              ],
+              "query": []
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{userToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"document_type\": \"owner_id\",\n  \"mime_type\": \"application/pdf\",\n  \"file_size\": 204800,\n  \"filename\": \"owner-id.pdf\",\n  \"related_object_type\": \"user_verification\",\n  \"related_object_id\": \"{{userId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json(); if (json.id) pm.environment.set('documentId', json.id); if (json.storagePath) pm.environment.set('storagePath', json.storagePath); if (json.signedUrl) pm.environment.set('signedUploadUrl', json.signedUrl);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Submit User Verification Documents",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}",
+                "disabled": false
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/verification/submit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "verification",
+                "submit"
+              ],
+              "query": []
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{userToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"documents\": [\n    {\n      \"document_type\": \"owner_id\",\n      \"storage_path\": \"{{storagePath}}\",\n      \"original_filename\": \"owner-id.pdf\",\n      \"mime_type\": \"application/pdf\",\n      \"file_size\": 204800,\n      \"expiry_date\": \"2030-12-31\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json(); if (json.status) pm.environment.set('verificationStatus', json.status);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Negative Upload - MIME Extension Mismatch",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}",
+                "disabled": false
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/upload/sign-url",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "upload",
+                "sign-url"
+              ],
+              "query": []
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{userToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"document_type\": \"owner_id\",\n  \"mime_type\": \"application/pdf\",\n  \"file_size\": 204800,\n  \"filename\": \"owner-id.png\",\n  \"related_object_type\": \"user_verification\",\n  \"related_object_id\": \"{{userId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Expected validation error', function () { pm.expect(pm.response.code).to.be.oneOf([400, 401]); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "description": "User notification listing and staff dispatch.",
+      "item": [
+        {
+          "name": "List My Notifications",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}",
+                "disabled": false
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/notifications",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "notifications"
+              ],
+              "query": []
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{userToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Staff Dispatch Notification",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}",
+                "disabled": false
+              },
+              {
+                "key": "x-internal-api-key",
+                "value": "{{internalApiKey}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/notifications/dispatch",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "notifications",
+                "dispatch"
+              ],
+              "query": []
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_ids\": [\n    \"{{userId}}\"\n  ],\n  \"notification_type\": \"identity_verified\",\n  \"channels\": [\n    \"in_app\",\n    \"email\"\n  ],\n  \"title\": \"Your identity has been verified\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Matches And Rooms",
+      "description": "Admin matching APIs and participant match-room APIs.",
+      "item": [
+        {
+          "name": "Admin Evaluate Matches",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}",
+                "disabled": false
+              },
+              {
+                "key": "x-internal-api-key",
+                "value": "{{internalApiKey}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/matches/evaluate",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "matches",
+                "evaluate"
+              ],
+              "query": []
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"minimumScore\": 0.65,\n  \"limit\": 25\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Match Requests",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}",
+                "disabled": false
+              },
+              {
+                "key": "x-internal-api-key",
+                "value": "{{internalApiKey}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/matches",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "matches"
+              ],
+              "query": []
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "const rows = json.matches || json.matches || json.rows || [];",
+                  "if (Array.isArray(rows) && rows.length && rows[0].id) pm.environment.set('matchRequestId', rows[0].id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Match Request",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}",
+                "disabled": false
+              },
+              {
+                "key": "x-internal-api-key",
+                "value": "{{internalApiKey}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/matches",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "matches"
+              ],
+              "query": []
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"source_object_type\": \"interest_signal\",\n  \"source_object_id\": \"{{interestId}}\",\n  \"target_object_type\": \"private_availability\",\n  \"target_object_id\": \"{{availabilityId}}\",\n  \"match_score\": 0.88,\n  \"match_reason\": \"Postman manual match smoke test\",\n  \"status\": \"proposed\",\n  \"admin_status\": \"pending_review\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json(); if (json.match && json.match.id) pm.environment.set('matchRequestId', json.match.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Match Request",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}",
+                "disabled": false
+              },
+              {
+                "key": "x-internal-api-key",
+                "value": "{{internalApiKey}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/matches/{{matchRequestId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "matches",
+                "{{matchRequestId}}"
+              ],
+              "query": []
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Match Request Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}",
+                "disabled": false
+              },
+              {
+                "key": "x-internal-api-key",
+                "value": "{{internalApiKey}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/matches/{{matchRequestId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "matches",
+                "{{matchRequestId}}"
+              ],
+              "query": []
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"accepted\",\n  \"admin_status\": \"approved\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Match Room",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}",
+                "disabled": false
+              },
+              {
+                "key": "x-internal-api-key",
+                "value": "{{internalApiKey}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/match-rooms",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "match-rooms"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"match_request_id\": \"{{matchRequestId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json(); if (json.room && json.room.id) pm.environment.set('matchRoomId', json.room.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin Create Match Room",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}",
+                "disabled": false
+              },
+              {
+                "key": "x-internal-api-key",
+                "value": "{{internalApiKey}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/match-rooms",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "match-rooms"
+              ],
+              "query": []
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"match_request_id\": \"{{matchRequestId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json(); if (json.room && json.room.id) pm.environment.set('matchRoomId', json.room.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Participant List My Match Rooms",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}",
+                "disabled": false
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/match-rooms",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "match-rooms"
+              ],
+              "query": []
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{userToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Participant Get Match Room",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}",
+                "disabled": false
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/match-rooms/{{matchRoomId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "match-rooms",
+                "{{matchRoomId}}"
+              ],
+              "query": []
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{userToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Participant Unlock Contact",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}",
+                "disabled": false
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/match-rooms/{{matchRoomId}}/unlock-contact",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "match-rooms",
+                "{{matchRoomId}}",
+                "unlock-contact"
+              ],
+              "query": []
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{userToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Admin Advance Match Room Stage",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}",
+                "disabled": false
+              },
+              {
+                "key": "x-internal-api-key",
+                "value": "{{internalApiKey}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/match-rooms/{{matchRoomId}}/stage",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "match-rooms",
+                "{{matchRoomId}}",
+                "stage"
+              ],
+              "query": []
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"next_stage\": \"response_received\",\n  \"note\": \"Postman stage transition smoke test\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin Submissions",
+      "description": "Admin/compliance queue, details, and moderation actions.",
+      "item": [
+        {
+          "name": "Admin Area",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}",
+                "disabled": false
+              },
+              {
+                "key": "x-internal-api-key",
+                "value": "{{internalApiKey}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin"
+              ],
+              "query": []
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Submission Summary",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}",
+                "disabled": false
+              },
+              {
+                "key": "x-internal-api-key",
+                "value": "{{internalApiKey}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/submissions/summary",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "submissions",
+                "summary"
+              ],
+              "query": []
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Submission Collections",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}",
+                "disabled": false
+              },
+              {
+                "key": "x-internal-api-key",
+                "value": "{{internalApiKey}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/submissions/collections",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "submissions",
+                "collections"
+              ],
+              "query": []
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Submissions - Pending",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}",
+                "disabled": false
+              },
+              {
+                "key": "x-internal-api-key",
+                "value": "{{internalApiKey}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/submissions?approvalStatus=pending_review",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "submissions"
+              ],
+              "query": [
+                {
+                  "key": "approvalStatus",
+                  "value": "pending_review",
+                  "description": "",
+                  "disabled": false
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "const rows = json.records || json.records || json.rows || [];",
+                  "if (Array.isArray(rows) && rows.length && rows[0].id) pm.environment.set('submissionId', rows[0].id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List Submissions - Availability Only",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}",
+                "disabled": false
+              },
+              {
+                "key": "x-internal-api-key",
+                "value": "{{internalApiKey}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/submissions?type=availability",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "submissions"
+              ],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "availability",
+                  "description": "",
+                  "disabled": false
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Submission Detail",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}",
+                "disabled": false
+              },
+              {
+                "key": "x-internal-api-key",
+                "value": "{{internalApiKey}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/submissions/{{submissionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "submissions",
+                "{{submissionId}}"
+              ],
+              "query": []
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Decision - Explicit Statuses",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}",
+                "disabled": false
+              },
+              {
+                "key": "x-internal-api-key",
+                "value": "{{internalApiKey}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/submissions/{{submissionId}}/decision",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "submissions",
+                "{{submissionId}}",
+                "decision"
+              ],
+              "query": []
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"approvalStatus\": \"approved\",\n  \"publicStatus\": \"matching\",\n  \"verificationLevel\": \"basic_checked\",\n  \"note\": \"Approved from Postman smoke test.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Action - Approve",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}",
+                "disabled": false
+              },
+              {
+                "key": "x-internal-api-key",
+                "value": "{{internalApiKey}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/submissions/{{submissionId}}/approve",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "submissions",
+                "{{submissionId}}",
+                "approve"
+              ],
+              "query": []
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"note\": \"Postman approve example\",\n  \"publicStatus\": \"matching\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Action - Reject",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}",
+                "disabled": false
+              },
+              {
+                "key": "x-internal-api-key",
+                "value": "{{internalApiKey}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/submissions/{{submissionId}}/reject",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "submissions",
+                "{{submissionId}}",
+                "reject"
+              ],
+              "query": []
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"note\": \"Postman reject example\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Action - Request Documents",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}",
+                "disabled": false
+              },
+              {
+                "key": "x-internal-api-key",
+                "value": "{{internalApiKey}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/submissions/{{submissionId}}/request-documents",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "submissions",
+                "{{submissionId}}",
+                "request-documents"
+              ],
+              "query": []
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"note\": \"Please upload ownership proof.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Action - Compliance Hold",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{complianceToken}}",
+                "disabled": false
+              },
+              {
+                "key": "x-internal-api-key",
+                "value": "{{internalApiKey}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/submissions/{{submissionId}}/compliance-hold",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "submissions",
+                "{{submissionId}}",
+                "compliance-hold"
+              ],
+              "query": []
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{complianceToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"note\": \"Compliance hold from Postman.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Action - Under Verification",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}",
+                "disabled": false
+              },
+              {
+                "key": "x-internal-api-key",
+                "value": "{{internalApiKey}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/submissions/{{submissionId}}/under-verification",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "submissions",
+                "{{submissionId}}",
+                "under-verification"
+              ],
+              "query": []
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"note\": \"Under verification from Postman.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Action - Mark Verified",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}",
+                "disabled": false
+              },
+              {
+                "key": "x-internal-api-key",
+                "value": "{{internalApiKey}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/submissions/{{submissionId}}/mark-verified",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "submissions",
+                "{{submissionId}}",
+                "mark-verified"
+              ],
+              "query": []
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"note\": \"Verified from Postman.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Action - Archive",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}",
+                "disabled": false
+              },
+              {
+                "key": "x-internal-api-key",
+                "value": "{{internalApiKey}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/submissions/{{submissionId}}/archive",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "submissions",
+                "{{submissionId}}",
+                "archive"
+              ],
+              "query": []
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"note\": \"Archived from Postman.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin Documents And Identity",
+      "description": "Compliance review queues, signed document viewing, document verification, and identity approval/rejection.",
+      "item": [
+        {
+          "name": "List Documents",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{complianceToken}}",
+                "disabled": false
+              },
+              {
+                "key": "x-internal-api-key",
+                "value": "{{internalApiKey}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/documents",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "documents"
+              ],
+              "query": []
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{complianceToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "const rows = json.documents || json.documents || json.rows || [];",
+                  "if (Array.isArray(rows) && rows.length && rows[0].id) pm.environment.set('documentId', rows[0].id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Signed View URL",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{complianceToken}}",
+                "disabled": false
+              },
+              {
+                "key": "x-internal-api-key",
+                "value": "{{internalApiKey}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/documents/{{documentId}}/view",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "documents",
+                "{{documentId}}",
+                "view"
+              ],
+              "query": []
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{complianceToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json(); if (json.signedUrl) pm.environment.set('signedViewUrl', json.signedUrl);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Verify Document - Approved",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{complianceToken}}",
+                "disabled": false
+              },
+              {
+                "key": "x-internal-api-key",
+                "value": "{{internalApiKey}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/documents/{{documentId}}/verify",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "documents",
+                "{{documentId}}",
+                "verify"
+              ],
+              "query": []
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{complianceToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"verified\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Verify Document - Failed",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{complianceToken}}",
+                "disabled": false
+              },
+              {
+                "key": "x-internal-api-key",
+                "value": "{{internalApiKey}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/documents/{{documentId}}/verify",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "documents",
+                "{{documentId}}",
+                "verify"
+              ],
+              "query": []
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{complianceToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"failed\",\n  \"rejection_reason\": \"Document image is unreadable.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Verification Queue",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{complianceToken}}",
+                "disabled": false
+              },
+              {
+                "key": "x-internal-api-key",
+                "value": "{{internalApiKey}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/verification-queue",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "verification-queue"
+              ],
+              "query": []
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{complianceToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json(); if (json.rows && json.rows.length && json.rows[0].id) pm.environment.set('targetUserId', json.rows[0].id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Verification Queue Detail",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{complianceToken}}",
+                "disabled": false
+              },
+              {
+                "key": "x-internal-api-key",
+                "value": "{{internalApiKey}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/verification-queue/{{targetUserId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "verification-queue",
+                "{{targetUserId}}"
+              ],
+              "query": []
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{complianceToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Approve Identity",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{complianceToken}}",
+                "disabled": false
+              },
+              {
+                "key": "x-internal-api-key",
+                "value": "{{internalApiKey}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/users/{{targetUserId}}/verify-identity",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "users",
+                "{{targetUserId}}",
+                "verify-identity"
+              ],
+              "query": []
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{complianceToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"approve\",\n  \"note\": \"Identity approved from Postman.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reject Identity / Action Required",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{complianceToken}}",
+                "disabled": false
+              },
+              {
+                "key": "x-internal-api-key",
+                "value": "{{internalApiKey}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/users/{{targetUserId}}/verify-identity",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "users",
+                "{{targetUserId}}",
+                "verify-identity"
+              ],
+              "query": []
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{complianceToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"reject\",\n  \"rejection_reason\": \"Please upload a clearer owner ID and company licence.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Audit And Webhooks",
+      "description": "SuperAdmin audit log and signed notification webhook examples.",
+      "item": [
+        {
+          "name": "SuperAdmin Audit Log",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{superAdminToken}}",
+                "disabled": false
+              },
+              {
+                "key": "x-internal-api-key",
+                "value": "{{internalApiKey}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/audit-log?limit=100",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "audit-log"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "100",
+                  "description": "",
+                  "disabled": false
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{superAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Webhook - Firestore Trigger (Bearer secret)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{notificationWebhookSecret}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/webhooks/firestore-trigger",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "webhooks",
+                "firestore-trigger"
+              ],
+              "query": []
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event_type\": \"identity_verified\",\n  \"user_id\": \"{{userId}}\",\n  \"title\": \"Identity verified\",\n  \"channel\": \"in_app\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Webhook - MySQL DB Trigger (HMAC signature example)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-galaxy-signature",
+                "value": "sha256={{webhookSignature}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/webhooks/mysql-db-trigger",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "webhooks",
+                "mysql-db-trigger"
+              ],
+              "query": []
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event_type\": \"submission_received\",\n  \"user_id\": \"{{userId}}\",\n  \"title\": \"Submission received\",\n  \"channel\": \"email\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Requires CryptoJS, available in the Postman sandbox.",
+                  "const secret = pm.environment.get('notificationWebhookSecret') || '';",
+                  "const body = pm.request.body ? pm.request.body.raw : '{}';",
+                  "const signature = CryptoJS.HmacSHA256(body, secret).toString(CryptoJS.enc.Hex);",
+                  "pm.environment.set('webhookSignature', signature);"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Negative And Security Tests",
+      "description": "Useful validation and RBAC checks. Some are expected to fail with 400/401/403.",
+      "item": [
+        {
+          "name": "No Token - Profile Should 401",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/profile/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "profile",
+                "me"
+              ],
+              "query": []
+            },
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Expected 401', function () { pm.expect(pm.response.code).to.eql(401); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Invalid Payment Method - Interest Should 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}",
+                "disabled": false
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/interest",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "interest"
+              ],
+              "query": []
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{userToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Postman QA buyer interest - Dubai apartment\",\n  \"availability_type\": \"Private matching only\",\n  \"listing_intent\": \"Keep private - match only\",\n  \"market_segment\": \"Residential\",\n  \"property_type\": \"Apartment / flat\",\n  \"country\": \"UAE\",\n  \"area_city\": \"Dubai\",\n  \"project_name\": \"Downtown Dubai\",\n  \"building_name\": \"Any premium tower\",\n  \"size_sqft\": 1100,\n  \"price_min\": 1000000,\n  \"price_max\": 1600000,\n  \"availability_date\": \"2026-09-01\",\n  \"privacy_level\": \"Admin only\",\n  \"private_description\": \"Buyer wants a private apartment opportunity in Dubai with verified owner authority.\",\n  \"category\": \"residential\",\n  \"offering_type\": \"sell\",\n  \"rooms\": 3,\n  \"bedrooms\": 2,\n  \"total_floors\": 40,\n  \"parking_spaces\": 1,\n  \"furnishing_type\": \"Furnished\",\n  \"project_status\": \"ready to move\",\n  \"amenities\": [\n    \"Balcony\",\n    \"security\"\n  ],\n  \"preferred_payment_method\": \"Wire Transfer\",\n  \"user_role\": \"Buyer\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Expected 400', function () { pm.expect(pm.response.code).to.eql(400); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Oversized File - Upload Should 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}",
+                "disabled": false
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/upload/sign-url",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "upload",
+                "sign-url"
+              ],
+              "query": []
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{userToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"document_type\": \"owner_id\",\n  \"mime_type\": \"application/pdf\",\n  \"file_size\": 12000000,\n  \"filename\": \"oversized.pdf\",\n  \"related_object_type\": \"user_verification\",\n  \"related_object_id\": \"{{userId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Expected 400', function () { pm.expect(pm.response.code).to.eql(400); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin Route With User Token Should 403",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}",
+                "disabled": false
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin"
+              ],
+              "query": []
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{userToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Expected 403 or 401', function () { pm.expect(pm.response.code).to.be.oneOf([401, 403]); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

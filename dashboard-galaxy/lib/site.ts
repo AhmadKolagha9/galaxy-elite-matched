@@ -2,16 +2,16 @@ export const site = {
   company: 'Galaxy Elite',
   product: 'Galaxy Elite Private Match',
   shortProduct: 'Private Match',
-  domain: 'galaxyelite.ae',
+  domain: 'admin.yourpropertymatch.cloud',
   get url() {
-    return process.env.NEXT_PUBLIC_SITE_URL || 'https://galaxyelite.ae'
+    return process.env.NEXT_PUBLIC_SITE_URL || 'https://admin.yourpropertymatch.cloud'
   },
   tagline: 'Public Interest. Private Property. Verified Match.',
   promise: 'No public listings. No spam. No hidden agents. Just verified private property matches.',
   description:
     'Galaxy Elite Private Match is a closed property matching experience where buyers, tenants, investors and land seekers post interest, owners and landlords submit availability privately, agents disclose their role, and matches open only after mutual approval.',
   whatsapp: process.env.WHATSAPP_NUMBER || '971000000000',
-  email: process.env.OPERATIONS_EMAIL || 'hello@galaxyelite.ae'
+  email: process.env.OPERATIONS_EMAIL || 'admin@yourpropertymatch.cloud'
 }
 
 export const mainNav = [

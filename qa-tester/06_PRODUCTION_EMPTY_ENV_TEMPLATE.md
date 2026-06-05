@@ -1,17 +1,17 @@
-# Production Empty Environment Template
+# Production Environment Template
 
 Date created: 2026-06-04
-Purpose: Empty production/staging values to fill before final QA and deployment.
+Purpose: Production/staging public URLs plus empty secret placeholders to fill before final QA and deployment.
 
-Do not put real secrets in this tracked file. Copy these names into the deployment platform secret manager and fill them there.
+Do not put real secrets in this tracked file. Copy these names into the deployment platform secret manager and fill secret values there.
 
 ## Remote URLs
 
 ```bash
-PRODUCTION_WEBSITE_URL=
-PRODUCTION_BACKEND_API_URL=
-PRODUCTION_ADMIN_DASHBOARD_URL=
-PRODUCTION_CORS_ORIGIN=
+PRODUCTION_WEBSITE_URL=https://yourpropertymatch.cloud
+PRODUCTION_BACKEND_API_URL=https://api.yourpropertymatch.cloud
+PRODUCTION_ADMIN_DASHBOARD_URL=https://admin.yourpropertymatch.cloud
+PRODUCTION_CORS_ORIGIN=https://yourpropertymatch.cloud,https://www.yourpropertymatch.cloud,https://admin.yourpropertymatch.cloud
 ```
 
 ## Backend Required Values
@@ -21,26 +21,26 @@ MYSQL_DATABASE_URL=
 DATABASE_URL=
 AUTH_JWT_SECRET=
 PRIVATE_DOCUMENT_BUCKET=
-CORS_ORIGIN=
+CORS_ORIGIN=https://yourpropertymatch.cloud,https://www.yourpropertymatch.cloud,https://admin.yourpropertymatch.cloud
 BACKEND_PORT=
 ```
 
 ## Website Required Values
 
 ```bash
-NEXT_PUBLIC_SITE_URL=
-BACKEND_API_URL=
-NEXT_PUBLIC_BACKEND_API_URL=
-ADMIN_EMAILS=
+NEXT_PUBLIC_SITE_URL=https://yourpropertymatch.cloud
+BACKEND_API_URL=https://api.yourpropertymatch.cloud
+NEXT_PUBLIC_BACKEND_API_URL=https://api.yourpropertymatch.cloud
+ADMIN_EMAILS=admin@yourpropertymatch.cloud
 ```
 
 ## Admin Dashboard Required Values
 
 ```bash
-NEXT_PUBLIC_SITE_URL=
-NEXT_PUBLIC_ADMIN_DASHBOARD_ORIGIN=
-ADMIN_DASHBOARD_ORIGIN=
-BACKEND_API_URL=
+NEXT_PUBLIC_SITE_URL=https://admin.yourpropertymatch.cloud
+NEXT_PUBLIC_ADMIN_DASHBOARD_ORIGIN=https://admin.yourpropertymatch.cloud
+ADMIN_DASHBOARD_ORIGIN=https://admin.yourpropertymatch.cloud
+BACKEND_API_URL=https://api.yourpropertymatch.cloud
 ```
 
 ## Optional Provider Values

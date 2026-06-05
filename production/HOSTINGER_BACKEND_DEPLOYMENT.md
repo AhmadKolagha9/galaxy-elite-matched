@@ -7,23 +7,23 @@ Runtime: Node.js 20+
 Process manager: PM2
 Reverse proxy: Nginx
 
-## Production URL Placeholders
+## Production URLs
 
-Keep these empty until the real domains are ready.
+These are the selected Hostinger production domains for this deployment.
 
 ```bash
-PRODUCTION_BACKEND_API_URL=
-PRODUCTION_WEBSITE_URL=
-PRODUCTION_ADMIN_DASHBOARD_URL=
-PRODUCTION_CORS_ORIGIN=
+PRODUCTION_BACKEND_API_URL=https://api.yourpropertymatch.cloud
+PRODUCTION_WEBSITE_URL=https://yourpropertymatch.cloud
+PRODUCTION_ADMIN_DASHBOARD_URL=https://admin.yourpropertymatch.cloud
+PRODUCTION_CORS_ORIGIN=https://yourpropertymatch.cloud,https://www.yourpropertymatch.cloud,https://admin.yourpropertymatch.cloud
 ```
 
-Example final mapping later:
+Final mapping:
 
 ```text
-Backend API: https://api.your-domain.com
-Website: https://your-domain.com
-Admin dashboard: https://admin.your-domain.com
+Backend API: https://api.yourpropertymatch.cloud
+Website: https://yourpropertymatch.cloud
+Admin dashboard: https://admin.yourpropertymatch.cloud
 ```
 
 ## 1. Connect To VPS

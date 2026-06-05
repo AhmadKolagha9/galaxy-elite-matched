@@ -62,7 +62,7 @@ export function controlErrorMessage(error: unknown, fallback: string) {
 }
 
 function backendBaseUrl() {
-  return (process.env.BACKEND_API_URL || process.env.NEXT_PUBLIC_BACKEND_API_URL || 'http://localhost:4000').replace(/\/$/, '')
+  return (process.env.BACKEND_API_URL || process.env.NEXT_PUBLIC_BACKEND_API_URL || 'https://api.yourpropertymatch.cloud').replace(/\/$/, '')
 }
 
 function text(value: unknown, fallback = '') {

@@ -23,11 +23,11 @@ type BackendProfileResponse = {
 const allowedRoles = new Set<AdminRole>(['admin', 'compliance', 'super_admin'])
 
 function backendBaseUrl() {
-  return (process.env.BACKEND_API_URL || process.env.NEXT_PUBLIC_BACKEND_API_URL || 'http://localhost:4000').replace(/\/$/, '')
+  return (process.env.BACKEND_API_URL || process.env.NEXT_PUBLIC_BACKEND_API_URL || 'https://api.yourpropertymatch.cloud').replace(/\/$/, '')
 }
 
 export function adminDashboardOrigin() {
-  const origin = process.env.ADMIN_DASHBOARD_ORIGIN || process.env.NEXT_PUBLIC_ADMIN_DASHBOARD_ORIGIN || 'https://control.galaxyelite.ae'
+  const origin = process.env.ADMIN_DASHBOARD_ORIGIN || process.env.NEXT_PUBLIC_ADMIN_DASHBOARD_ORIGIN || 'https://admin.yourpropertymatch.cloud'
   if (origin === '*') throw new Error('ADMIN_DASHBOARD_ORIGIN cannot be a wildcard.')
   return origin
 }

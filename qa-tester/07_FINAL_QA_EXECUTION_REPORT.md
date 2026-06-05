@@ -7,7 +7,7 @@ State: **No-Go for production**
 
 ## Summary
 
-The available local automated QA gates were executed. Build, typecheck, and role/permission checks pass. Production readiness is still blocked because real staging/production environment values and remote URLs are not configured.
+The available local automated QA gates were executed. Build, typecheck, and role/permission checks pass. Production readiness is still blocked because real staging/production secret values plus final browser/storage/matching/security QA remain open.
 
 ## Commands Run
 
@@ -42,19 +42,19 @@ The following required values are missing from the current shell/deployment envi
 
 ## Work Completed In This Pass
 
-- Added `.env.production.example` and [06_PRODUCTION_EMPTY_ENV_TEMPLATE.md](/home/aka/Downloads/galaxy-elite-private-match-ultimate/qa-tester/06_PRODUCTION_EMPTY_ENV_TEMPLATE.md) with empty production remote URL placeholders.
-- Updated [05_FINAL_QA_PRODUCTION_READINESS_CHECKLIST.md](/home/aka/Downloads/galaxy-elite-private-match-ultimate/qa-tester/05_FINAL_QA_PRODUCTION_READINESS_CHECKLIST.md) to reference the empty production env template.
+- Added `.env.production.example` and [06_PRODUCTION_EMPTY_ENV_TEMPLATE.md](/home/aka/Downloads/galaxy-elite-private-match-ultimate/qa-tester/06_PRODUCTION_EMPTY_ENV_TEMPLATE.md) with production remote URLs and empty secret placeholders.
+- Updated [05_FINAL_QA_PRODUCTION_READINESS_CHECKLIST.md](/home/aka/Downloads/galaxy-elite-private-match-ultimate/qa-tester/05_FINAL_QA_PRODUCTION_READINESS_CHECKLIST.md) to reference the production env template.
 - Updated [README.md](/home/aka/Downloads/galaxy-elite-private-match-ultimate/qa-tester/README.md) so the QA folder index includes the production env template.
 
 ## Production Remote URL Placeholders
 
-These are intentionally empty until real production domains are selected:
+These now point at the Hostinger production domains:
 
 ```bash
-PRODUCTION_WEBSITE_URL=
-PRODUCTION_BACKEND_API_URL=
-PRODUCTION_ADMIN_DASHBOARD_URL=
-PRODUCTION_CORS_ORIGIN=
+PRODUCTION_WEBSITE_URL=https://yourpropertymatch.cloud
+PRODUCTION_BACKEND_API_URL=https://api.yourpropertymatch.cloud
+PRODUCTION_ADMIN_DASHBOARD_URL=https://admin.yourpropertymatch.cloud
+PRODUCTION_CORS_ORIGIN=https://yourpropertymatch.cloud,https://www.yourpropertymatch.cloud,https://admin.yourpropertymatch.cloud
 ```
 
 ## Remaining Final QA Work

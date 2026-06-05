@@ -46,13 +46,13 @@ Production URL/env placeholder files:
 - `.env.production.example`
 - `qa-tester/06_PRODUCTION_EMPTY_ENV_TEMPLATE.md`
 
-The production remote URL values are intentionally empty until the final hosting/API domains are selected:
+The production remote URL values are now selected for the Hostinger VPS deployment:
 
 ```bash
-PRODUCTION_WEBSITE_URL=
-PRODUCTION_BACKEND_API_URL=
-PRODUCTION_ADMIN_DASHBOARD_URL=
-PRODUCTION_CORS_ORIGIN=
+PRODUCTION_WEBSITE_URL=https://yourpropertymatch.cloud
+PRODUCTION_BACKEND_API_URL=https://api.yourpropertymatch.cloud
+PRODUCTION_ADMIN_DASHBOARD_URL=https://admin.yourpropertymatch.cloud
+PRODUCTION_CORS_ORIGIN=https://yourpropertymatch.cloud,https://www.yourpropertymatch.cloud,https://admin.yourpropertymatch.cloud
 ```
 
 ## What Is Already QA-Passed
@@ -76,7 +76,7 @@ The following areas are no longer blocking production from the code/build side:
 ### QA-FINAL-001: Configure Staging/Production Environment
 
 Severity: Critical
-Status: Blocked - empty production placeholders added, real deployment values still required
+Status: Blocked - production URLs selected, real secret/deployment values still required
 
 Required action:
 
@@ -91,7 +91,7 @@ Required action:
 
 Current action completed:
 
-- Added empty production remote URL and env placeholders in `.env.production.example` and `qa-tester/06_PRODUCTION_EMPTY_ENV_TEMPLATE.md`.
+- Added production remote URLs and empty secret placeholders in `.env.production.example` and `qa-tester/06_PRODUCTION_EMPTY_ENV_TEMPLATE.md`.
 
 Acceptance:
 
@@ -334,7 +334,7 @@ State: **No-Go for production**
 
 Completed now:
 
-- Added `.env.production.example` and `qa-tester/06_PRODUCTION_EMPTY_ENV_TEMPLATE.md` with empty production remote URL placeholders.
+- Added `.env.production.example` and `qa-tester/06_PRODUCTION_EMPTY_ENV_TEMPLATE.md` with production remote URLs and empty secret placeholders.
 - Ran `npm --prefix dashboard-galaxy run qa:permissions`: Pass.
 - Ran `npm run qa:readiness:strict`: Fail because required production/staging env values are missing.
 - Ran `npm run qa:all`: build, typecheck, and permission checks passed; non-strict readiness reported `34/40` because env values are missing.
@@ -342,7 +342,7 @@ Completed now:
 
 Current blockers:
 
-- Real production/staging env values are not configured.
+- Real production/staging secret values are not configured in this local shell.
 - Browser E2E user journeys are not executed.
 - Real signed upload/private document QA is not executed.
 - Seeded matching/ranking QA is not executed.

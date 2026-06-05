@@ -11,8 +11,9 @@ const parsePort = (value: string | undefined) => {
 };
 
 const officialCorsOrigins = [
-  "https://match.galaxyelite.ae",
-  "https://www.match.galaxyelite.ae"
+  "https://yourpropertymatch.cloud",
+  "https://www.yourpropertymatch.cloud",
+  "https://admin.yourpropertymatch.cloud"
 ];
 
 const localCorsOrigins = ["http://localhost:3000", "http://localhost:3001", "http://localhost:4000"];

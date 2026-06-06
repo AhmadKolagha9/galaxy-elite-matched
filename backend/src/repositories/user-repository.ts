@@ -16,6 +16,9 @@ type UserRow = {
   email_verification_code_hash: string | null;
   email_verification_expires_at: string | Date | null;
   email_verification_attempts: number | string | null;
+  password_reset_code_hash: string | null;
+  password_reset_expires_at: string | Date | null;
+  password_reset_attempts: number | string | null;
   is_profile_locked: 0 | 1 | boolean;
   verification_review_note: string | null;
   verified_at: string | Date | null;
@@ -61,6 +64,9 @@ const selectUserColumns = `
   email_verification_code_hash,
   email_verification_expires_at,
   email_verification_attempts,
+  password_reset_code_hash,
+  password_reset_expires_at,
+  password_reset_attempts,
   is_profile_locked,
   verification_review_note,
   verified_at,
@@ -98,6 +104,9 @@ const toPrivateRecord = (row: UserRow): NativeUserPrivateRecord => ({
   emailVerificationCodeHash: row.email_verification_code_hash,
   emailVerificationExpiresAt: toIso(row.email_verification_expires_at),
   emailVerificationAttempts: Number(row.email_verification_attempts ?? 0),
+  passwordResetCodeHash: row.password_reset_code_hash,
+  passwordResetExpiresAt: toIso(row.password_reset_expires_at),
+  passwordResetAttempts: Number(row.password_reset_attempts ?? 0),
   isProfileLocked: Boolean(row.is_profile_locked),
   verificationReviewNote: row.verification_review_note,
   verifiedAt: toIso(row.verified_at),
@@ -112,6 +121,9 @@ const toPublicRecord = (row: UserRow): NativeUserRecord => {
     emailVerificationCodeHash: _emailVerificationCodeHash,
     emailVerificationExpiresAt: _emailVerificationExpiresAt,
     emailVerificationAttempts: _emailVerificationAttempts,
+    passwordResetCodeHash: _passwordResetCodeHash,
+    passwordResetExpiresAt: _passwordResetExpiresAt,
+    passwordResetAttempts: _passwordResetAttempts,
     ...safeRecord
   } = toPrivateRecord(row);
   return safeRecord;
@@ -216,6 +228,47 @@ export const userRepository = {
        where id = ?
        returning ${selectUserColumns}`,
       [id]
+    );
+    return toPublicRecord(result.rows[0]);
+  },
+
+  setPasswordResetChallenge: async (client: Queryable, input: { id: string; codeHash: string; expiresAt: Date }) => {
+    const result = await client.query<UserRow>(
+      `update users
+       set password_reset_code_hash = ?,
+           password_reset_expires_at = ?,
+           password_reset_attempts = 0,
+           password_reset_requested_at = current_timestamp
+       where id = ?
+       returning ${selectUserColumns}`,
+      [input.codeHash, input.expiresAt, input.id]
+    );
+    return toPrivateRecord(result.rows[0]);
+  },
+
+  incrementPasswordResetAttempts: async (client: Queryable, id: string) => {
+    const result = await client.query<UserRow>(
+      `update users
+       set password_reset_attempts = password_reset_attempts + 1
+       where id = ?
+       returning ${selectUserColumns}`,
+      [id]
+    );
+    return toPrivateRecord(result.rows[0]);
+  },
+
+  updatePasswordAndClearReset: async (client: Queryable, input: { id: string; passwordHash: string }) => {
+    const result = await client.query<UserRow>(
+      `update users
+       set password_hash = ?,
+           password_reset_code_hash = null,
+           password_reset_expires_at = null,
+           password_reset_attempts = 0,
+           email_verification_status = 'verified',
+           email_verified_at = coalesce(email_verified_at, current_timestamp)
+       where id = ?
+       returning ${selectUserColumns}`,
+      [input.passwordHash, input.id]
     );
     return toPublicRecord(result.rows[0]);
   },

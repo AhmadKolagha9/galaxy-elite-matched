@@ -66,5 +66,34 @@ export const emailService = {
         </div>
       `
     });
+  },
+
+  sendPasswordResetCode: async (input: { to: string; code: string; fullName?: string | null; expiresInMinutes: number }) => {
+    const name = input.fullName?.trim() || "there";
+    const safeName = escapeHtml(name);
+    const safeCode = escapeHtml(input.code);
+
+    await getTransporter().sendMail({
+      from: env.smtpFrom,
+      to: input.to,
+      subject: "Reset your Galaxy Elite password",
+      text: [
+        `Hello ${name},`,
+        "",
+        `Your Galaxy Elite Private Match password reset code is ${input.code}.`,
+        `This code expires in ${input.expiresInMinutes} minutes.`,
+        "",
+        "If you did not request a password reset, you can ignore this email."
+      ].join("\n"),
+      html: `
+        <div style="font-family:Arial,sans-serif;line-height:1.5;color:#172033">
+          <p>Hello ${safeName},</p>
+          <p>Your Galaxy Elite Private Match password reset code is:</p>
+          <p style="font-size:28px;font-weight:700;letter-spacing:4px">${safeCode}</p>
+          <p>This code expires in ${input.expiresInMinutes} minutes.</p>
+          <p>If you did not request a password reset, you can ignore this email.</p>
+        </div>
+      `
+    });
   }
 };

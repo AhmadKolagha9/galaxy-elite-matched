@@ -57,6 +57,35 @@ authRouter.post(
 );
 
 authRouter.post(
+  "/forgot-password",
+  asyncHandler(async (request, response) => {
+    const body = requireObjectBody(request.body);
+    const result = await nativeAuthService.requestPasswordReset({ email: asString(body.email) });
+    response.json(result);
+  })
+);
+
+authRouter.post(
+  "/reset-password",
+  asyncHandler(async (request, response) => {
+    const body = requireObjectBody(request.body);
+    const result = await nativeAuthService.resetPassword({
+      email: asString(body.email),
+      code: asString(body.code),
+      password: typeof body.password === "string" ? body.password : ""
+    });
+
+    response.json({
+      ok: true,
+      user: result.user,
+      token: result.token,
+      expiresIn: result.expiresIn,
+      message: "Password reset. Login session created."
+    });
+  })
+);
+
+authRouter.post(
   "/login",
   asyncHandler(async (request, response) => {
     const body = requireObjectBody(request.body);

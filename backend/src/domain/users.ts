@@ -28,6 +28,9 @@ export type NativeUserPrivateRecord = NativeUserRecord & {
   emailVerificationCodeHash?: string | null;
   emailVerificationExpiresAt?: string | null;
   emailVerificationAttempts: number;
+  passwordResetCodeHash?: string | null;
+  passwordResetExpiresAt?: string | null;
+  passwordResetAttempts: number;
 };
 
 const accountVerificationStatusSet = new Set<string>(accountVerificationStatuses);

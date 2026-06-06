@@ -85,5 +85,6 @@ export const env = {
   smtpPassword: process.env.SMTP_PASSWORD,
   smtpFrom: process.env.SMTP_FROM ?? process.env.EMAIL_FROM ?? "Galaxy Elite <notifications@galaxy-elite.local>",
   emailVerificationTtlMinutes: parsePositiveInteger(process.env.EMAIL_VERIFICATION_TTL_MINUTES, 15, "EMAIL_VERIFICATION_TTL_MINUTES"),
+  passwordResetTtlMinutes: parsePositiveInteger(process.env.PASSWORD_RESET_TTL_MINUTES, 15, "PASSWORD_RESET_TTL_MINUTES"),
   adminNotificationEmails: parseList(process.env.ADMIN_NOTIFICATION_EMAILS)
 } as const;

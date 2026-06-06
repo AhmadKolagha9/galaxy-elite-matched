@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { AuthNotice } from '@/components/AuthNotice'
-import { loginAction } from '@/lib/auth'
+import { LoginForm } from '@/components/LoginForm'
 import { pageMetadata } from '@/lib/seo'
 
 export const metadata: Metadata = pageMetadata({
@@ -11,7 +11,7 @@ export const metadata: Metadata = pageMetadata({
   noindex: true
 })
 
-export default async function LoginPage({ searchParams }: { searchParams: Promise<{ error?: string; notice?: string }> }) {
+export default async function LoginPage({ searchParams }: { searchParams: Promise<{ error?: string; notice?: string; next?: string }> }) {
   const params = await searchParams
   return (
     <section className="auth-section">
@@ -19,11 +19,8 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
         <p className="eyebrow">Member login</p>
         <h1>Access your private match dashboard.</h1>
         <AuthNotice searchParams={params} />
-        <form className="auth-form" action={loginAction}>
-          <label>Email<input name="email" type="email" autoComplete="email" required /></label>
-          <label>Password<input name="password" type="password" autoComplete="current-password" required /></label>
-          <button className="button button-gold" type="submit">Login</button>
-        </form>
+        <LoginForm next={params.next} />
+        <p><Link href="/forgot-password"><strong>Forgot password?</strong></Link></p>
         <p>New to Private Match? <Link href="/register"><strong>Create an account</strong></Link></p>
       </div>
       <aside className="auth-aside">

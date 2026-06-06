@@ -13,6 +13,7 @@ import { emailService } from "./email-service.js";
 
 const emailPattern = /^\S+@\S+\.\S+$/;
 const maxVerificationAttempts = 5;
+const maxPasswordResetAttempts = 5;
 
 const normalizeEmail = (email: string) => email.trim().toLowerCase();
 
@@ -33,6 +34,9 @@ const safeUser = (user: NativeUserPrivateRecord | NativeUserRecord): NativeUserR
     emailVerificationCodeHash: _emailVerificationCodeHash,
     emailVerificationExpiresAt: _emailVerificationExpiresAt,
     emailVerificationAttempts: _emailVerificationAttempts,
+    passwordResetCodeHash: _passwordResetCodeHash,
+    passwordResetExpiresAt: _passwordResetExpiresAt,
+    passwordResetAttempts: _passwordResetAttempts,
     ...record
   } = user as NativeUserPrivateRecord;
   return record;
@@ -41,9 +45,14 @@ const safeUser = (user: NativeUserPrivateRecord | NativeUserRecord): NativeUserR
 const codeHash = (email: string, code: string) =>
   crypto.createHash("sha256").update(`${normalizeEmail(email)}:${code}:${requireJwtSecret()}`).digest("hex");
 
+const passwordResetCodeHash = (email: string, code: string) =>
+  crypto.createHash("sha256").update(`${normalizeEmail(email)}:${code}:password-reset:${requireJwtSecret()}`).digest("hex");
+
 const generateVerificationCode = () => String(crypto.randomInt(0, 1_000_000)).padStart(6, "0");
 
 const expiresAt = () => new Date(Date.now() + env.emailVerificationTtlMinutes * 60 * 1000);
+
+const passwordResetExpiresAt = () => new Date(Date.now() + env.passwordResetTtlMinutes * 60 * 1000);
 
 const safeHashEquals = (left: string, right: string) => {
   const leftBuffer = Buffer.from(left, "hex");
@@ -81,6 +90,15 @@ const sendCode = async (user: NativeUserRecord, code: string) => {
     code,
     fullName: user.fullName,
     expiresInMinutes: env.emailVerificationTtlMinutes
+  });
+};
+
+const sendPasswordResetCode = async (user: NativeUserRecord, code: string) => {
+  await emailService.sendPasswordResetCode({
+    to: user.email,
+    code,
+    fullName: user.fullName,
+    expiresInMinutes: env.passwordResetTtlMinutes
   });
 };
 
@@ -177,6 +195,56 @@ export const nativeAuthService = {
 
     if (user) await sendCode(user, code);
     return { ok: true, message: "If the account is pending verification, a new code has been sent." };
+  },
+
+  requestPasswordReset: async (input: { email: string }) => {
+    const email = normalizeEmail(input.email);
+    if (!emailPattern.test(email)) throw badRequest("Email must be valid.");
+    emailService.assertConfigured();
+
+    const code = generateVerificationCode();
+    const user = await withTransaction(async (client) => {
+      const existing = await userRepository.findPrivateByEmailForUpdate(client, email);
+      if (!existing) return null;
+      return safeUser(await userRepository.setPasswordResetChallenge(client, {
+        id: existing.id,
+        codeHash: passwordResetCodeHash(email, code),
+        expiresAt: passwordResetExpiresAt()
+      }));
+    });
+
+    if (user) await sendPasswordResetCode(user, code);
+    return { ok: true, message: "If an account exists for this email, a reset code has been sent." };
+  },
+
+  resetPassword: async (input: { email: string; code: string; password: string }) => {
+    const email = normalizeEmail(input.email);
+    const code = input.code.trim();
+    if (!emailPattern.test(email)) throw badRequest("Email must be valid.");
+    if (!/^\d{6}$/.test(code)) throw badRequest("Reset code must be six digits.");
+    if (input.password.length < 12) throw badRequest("Password must be at least 12 characters.");
+
+    const passwordHash = await bcrypt.hash(input.password, env.bcryptSaltRounds);
+    const publicUser = await withTransaction(async (client) => {
+      const user = await userRepository.findPrivateByEmailForUpdate(client, email);
+      if (!user) throw unauthorized("Invalid password reset code.");
+      if (!user.passwordResetCodeHash || !user.passwordResetExpiresAt) throw badRequest("Password reset code expired. Request a new code.");
+      if (user.passwordResetAttempts >= maxPasswordResetAttempts) throw badRequest("Too many reset attempts. Request a new code.");
+      if (new Date(user.passwordResetExpiresAt).getTime() < Date.now()) throw badRequest("Password reset code expired. Request a new code.");
+
+      const matches = safeHashEquals(user.passwordResetCodeHash, passwordResetCodeHash(email, code));
+      if (!matches) {
+        await userRepository.incrementPasswordResetAttempts(client, user.id);
+        throw badRequest("Invalid password reset code.");
+      }
+
+      const updated = await userRepository.updatePasswordAndClearReset(client, { id: user.id, passwordHash });
+      await userRepository.upsertProfile(client, updated);
+      await userRepository.ensureRoles(client, updated.id, updated.primaryRole);
+      return updated;
+    });
+
+    return { ok: true, user: publicUser, ...signUserToken(publicUser) };
   },
 
   login: async (input: { email: string; password: string }) => {

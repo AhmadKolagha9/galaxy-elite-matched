@@ -49,16 +49,6 @@ try {
   const userId = rows?.[0]?.id
   if (!userId) throw new Error('Could not resolve staff user id after upsert.')
 
-  const roles = role === 'super_admin' ? ['user', 'admin', 'compliance', 'super_admin'] : ['user', role]
-  for (const assignedRole of [...new Set(roles)]) {
-    await connection.execute(
-      `insert into user_roles (user_id, role, assigned_by)
-       values (?, ?, ?)
-       on duplicate key update role = values(role)`,
-      [userId, assignedRole, userId]
-    )
-  }
-
   await connection.execute(
     `insert into profiles (user_id, full_name, email, primary_role, verification_level)
      values (?, ?, ?, ?, 'verified')
@@ -69,6 +59,16 @@ try {
        verification_level = 'verified'`,
     [userId, fullName, email, role]
   )
+
+  const roles = role === 'super_admin' ? ['user', 'admin', 'compliance', 'super_admin'] : ['user', role]
+  for (const assignedRole of [...new Set(roles)]) {
+    await connection.execute(
+      `insert into user_roles (user_id, role, assigned_by)
+       values (?, ?, ?)
+       on duplicate key update role = values(role)`,
+      [userId, assignedRole, userId]
+    )
+  }
 
   await connection.commit()
   console.log(`Upserted ${role} staff user ${email}`)

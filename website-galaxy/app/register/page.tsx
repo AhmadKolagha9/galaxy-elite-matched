@@ -27,7 +27,7 @@ export default async function RegisterPage({ searchParams }: { searchParams: Pro
         <h2>Start now. Verify later.</h2>
         <ul>
           <li>Create a member profile with only your core contact details.</li>
-          <li>Access the dashboard immediately after signup.</li>
+          <li>Confirm your email with a six-digit code before dashboard access.</li>
           <li>Submit identity and authority checks from your private workspace when required.</li>
           <li>Private matching data stays hidden until review and approval.</li>
         </ul>

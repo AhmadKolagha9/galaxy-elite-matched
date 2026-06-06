@@ -65,27 +65,7 @@ export function RegisterForm() {
         'Could not create account.'
       )
 
-      const loginBody = await readAuthResponse(
-        await fetch(`${apiBase}/api/auth/login`, {
-          method: 'POST',
-          headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ email, password })
-        }),
-        'Account created, but automatic login failed.'
-      )
-
-      if (!loginBody.token) throw new Error('Backend login did not return an authorization token.')
-
-      await readAuthResponse(
-        await fetch('/api/auth/session', {
-          method: 'POST',
-          headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ token: loginBody.token })
-        }),
-        'Could not store your secure session.'
-      )
-
-      router.replace('/dashboard')
+      router.replace(`/verify-email?email=${encodeURIComponent(email)}`)
       router.refresh()
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'Could not create account.')
@@ -95,13 +75,13 @@ export function RegisterForm() {
 
   return (
     <form className="auth-form" onSubmit={handleSubmit}>
-      <label>Full name<input name="fullName" autoComplete="name" required /></label>
-      <label>Email<input name="email" type="email" autoComplete="email" required /></label>
-      <label>Phone number<input name="phone" type="tel" autoComplete="tel" required /></label>
-      <label>Password<input name="password" type="password" autoComplete="new-password" minLength={12} required /></label>
+      <label>Full name<input name="fullName" autoComplete="name" disabled={status === 'loading'} required /></label>
+      <label>Email<input name="email" type="email" autoComplete="email" disabled={status === 'loading'} required /></label>
+      <label>Phone number<input name="phone" type="tel" autoComplete="tel" disabled={status === 'loading'} required /></label>
+      <label>Password<input name="password" type="password" autoComplete="new-password" minLength={12} disabled={status === 'loading'} required /></label>
       {error ? <p className="form-error auth-message">{error}</p> : null}
       <button className="button button-gold" type="submit" disabled={status === 'loading'}>
-        {status === 'loading' ? 'Creating Account...' : 'Create Account'}
+        {status === 'loading' ? 'Sending Code...' : 'Create Account'}
       </button>
     </form>
   )

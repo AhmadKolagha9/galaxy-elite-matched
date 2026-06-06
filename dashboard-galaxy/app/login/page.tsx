@@ -14,7 +14,7 @@ export default function LoginPage() {
     <section className="auth-section">
       <div className="auth-panel">
         <p className="eyebrow">Corporate control</p>
-        <h1>Staff access requires a backend-issued control token.</h1>
+        <h1>Staff access uses native backend email and password.</h1>
         <Suspense fallback={<p className="form-note">Loading secure login...</p>}>
           <CorporateLoginForm />
         </Suspense>
@@ -24,7 +24,7 @@ export default function LoginPage() {
         <h2>No public dashboard routes.</h2>
         <ul>
           <li>Backend JWTs are verified by the Express API.</li>
-          <li>Only admin, compliance, or super_admin roles can enter.</li>
+          <li>Only admin, compliance, or super_admin users can enter.</li>
           <li>Taxonomy and audit logs require superAdmin access.</li>
           <li>Every route is marked noindex, nofollow, noarchive.</li>
         </ul>

@@ -14,11 +14,11 @@ export function CorporateLoginForm() {
 
   const nextPath = safeDashboardNextPath(searchParams.get('next'))
 
-  async function establishSession(token: string) {
+  async function establishSession(email: string, password: string) {
     const response = await fetch('/api/admin-session', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ token })
+      body: JSON.stringify({ email, password })
     })
     const body = (await response.json().catch(() => null)) as { ok?: boolean; error?: string } | null
     if (!response.ok || body?.ok === false) throw new Error(body?.error || 'Corporate authorization failed.')
@@ -30,10 +30,12 @@ export function CorporateLoginForm() {
     setMessage('')
 
     const formData = new FormData(event.currentTarget)
-    const token = String(formData.get('token') || '').trim()
+    const email = String(formData.get('email') || '').trim().toLowerCase()
+    const password = String(formData.get('password') || '')
 
     try {
-      await establishSession(token)
+      if (!email || !password) throw new Error('Enter your staff email and password.')
+      await establishSession(email, password)
       router.replace(nextPath)
       router.refresh()
     } catch (error) {
@@ -44,12 +46,12 @@ export function CorporateLoginForm() {
 
   return (
     <form className="auth-form" onSubmit={onSubmit}>
-      <label>Backend Staff Token<input name="token" type="password" autoComplete="one-time-code" required /></label>
+      <label>Staff email<input name="email" type="email" autoComplete="email" required /></label>
+      <label>Password<input name="password" type="password" autoComplete="current-password" required /></label>
       {message ? <p className="form-error">{message}</p> : null}
       <button className="button button-gold" type="submit" disabled={state === 'submitting'}>
-        {state === 'submitting' ? 'Verifying Token...' : 'Access Control Platform'}
+        {state === 'submitting' ? 'Signing In...' : 'Access Control Platform'}
       </button>
     </form>
   )
 }
-

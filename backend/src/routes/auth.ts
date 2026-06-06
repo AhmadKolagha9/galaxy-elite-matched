@@ -22,10 +22,37 @@ authRouter.post(
     response.status(201).json({
       ok: true,
       user: result.user,
+      requiresEmailVerification: result.requiresEmailVerification,
+      message: "Account registered. Check your email for the verification code."
+    });
+  })
+);
+
+authRouter.post(
+  "/verify-email",
+  asyncHandler(async (request, response) => {
+    const body = requireObjectBody(request.body);
+    const result = await nativeAuthService.verifyEmail({
+      email: asString(body.email),
+      code: asString(body.code)
+    });
+
+    response.json({
+      ok: true,
+      user: result.user,
       token: result.token,
       expiresIn: result.expiresIn,
-      message: "Account registered with deferred verification."
+      message: "Email verified. Login session created."
     });
+  })
+);
+
+authRouter.post(
+  "/resend-verification",
+  asyncHandler(async (request, response) => {
+    const body = requireObjectBody(request.body);
+    const result = await nativeAuthService.resendVerification({ email: asString(body.email) });
+    response.json(result);
   })
 );
 
@@ -44,6 +71,25 @@ authRouter.post(
       token: result.token,
       expiresIn: result.expiresIn,
       message: "Login successful."
+    });
+  })
+);
+
+authRouter.post(
+  "/admin/login",
+  asyncHandler(async (request, response) => {
+    const body = requireObjectBody(request.body);
+    const result = await nativeAuthService.loginStaff({
+      email: asString(body.email),
+      password: typeof body.password === "string" ? body.password : ""
+    });
+
+    response.json({
+      ok: true,
+      user: result.user,
+      token: result.token,
+      expiresIn: result.expiresIn,
+      message: "Staff login successful."
     });
   })
 );

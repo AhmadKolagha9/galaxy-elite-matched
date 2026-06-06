@@ -1,5 +1,5 @@
 import { query, type Queryable } from "../db/pool.js";
-import type { NativeUserPrivateRecord, NativeUserRecord, AccountVerificationStatus } from "../domain/users.js";
+import type { NativeUserPrivateRecord, NativeUserRecord, AccountVerificationStatus, EmailVerificationStatus } from "../domain/users.js";
 import type { UserRole } from "../domain/status.js";
 import { notFound } from "../http/errors.js";
 
@@ -11,6 +11,11 @@ type UserRow = {
   phone: string | null;
   primary_role: UserRole;
   verification_status: AccountVerificationStatus;
+  email_verification_status: EmailVerificationStatus;
+  email_verified_at: string | Date | null;
+  email_verification_code_hash: string | null;
+  email_verification_expires_at: string | Date | null;
+  email_verification_attempts: number | string | null;
   is_profile_locked: 0 | 1 | boolean;
   verification_review_note: string | null;
   verified_at: string | Date | null;
@@ -51,6 +56,11 @@ const selectUserColumns = `
   phone,
   primary_role,
   verification_status,
+  email_verification_status,
+  email_verified_at,
+  email_verification_code_hash,
+  email_verification_expires_at,
+  email_verification_attempts,
   is_profile_locked,
   verification_review_note,
   verified_at,
@@ -83,6 +93,11 @@ const toPrivateRecord = (row: UserRow): NativeUserPrivateRecord => ({
   phone: row.phone,
   primaryRole: row.primary_role,
   verificationStatus: row.verification_status,
+  emailVerificationStatus: row.email_verification_status ?? "verified",
+  emailVerifiedAt: toIso(row.email_verified_at),
+  emailVerificationCodeHash: row.email_verification_code_hash,
+  emailVerificationExpiresAt: toIso(row.email_verification_expires_at),
+  emailVerificationAttempts: Number(row.email_verification_attempts ?? 0),
   isProfileLocked: Boolean(row.is_profile_locked),
   verificationReviewNote: row.verification_review_note,
   verifiedAt: toIso(row.verified_at),
@@ -92,7 +107,13 @@ const toPrivateRecord = (row: UserRow): NativeUserPrivateRecord => ({
 });
 
 const toPublicRecord = (row: UserRow): NativeUserRecord => {
-  const { passwordHash: _passwordHash, ...safeRecord } = toPrivateRecord(row);
+  const {
+    passwordHash: _passwordHash,
+    emailVerificationCodeHash: _emailVerificationCodeHash,
+    emailVerificationExpiresAt: _emailVerificationExpiresAt,
+    emailVerificationAttempts: _emailVerificationAttempts,
+    ...safeRecord
+  } = toPrivateRecord(row);
   return safeRecord;
 };
 
@@ -102,13 +123,13 @@ const uniqueRoles = (primaryRole: UserRole) =>
 export const userRepository = {
   createNativeUser: async (
     client: Queryable,
-    input: { email: string; passwordHash: string; fullName?: string; phone?: string; primaryRole: UserRole }
+    input: { email: string; passwordHash: string; fullName?: string; phone?: string; primaryRole: UserRole; emailVerificationCodeHash?: string; emailVerificationExpiresAt?: Date }
   ) => {
     const result = await client.query<UserRow>(
-      `insert into users (email, password_hash, full_name, phone, primary_role, verification_status, is_profile_locked)
-       values (?, ?, ?, ?, ?, 'unverified', false)
+      `insert into users (email, password_hash, full_name, phone, primary_role, verification_status, email_verification_status, email_verification_code_hash, email_verification_expires_at, email_verification_attempts, is_profile_locked)
+       values (?, ?, ?, ?, ?, 'unverified', 'pending', ?, ?, 0, false)
        returning ${selectUserColumns}`,
-      [input.email, input.passwordHash, input.fullName ?? null, input.phone ?? null, input.primaryRole]
+      [input.email, input.passwordHash, input.fullName ?? null, input.phone ?? null, input.primaryRole, input.emailVerificationCodeHash ?? null, input.emailVerificationExpiresAt ?? null]
     );
     return toPrivateRecord(result.rows[0]);
   },
@@ -143,6 +164,11 @@ export const userRepository = {
     return result.rows[0] ? toPrivateRecord(result.rows[0]) : null;
   },
 
+  findPrivateByEmailForUpdate: async (client: Queryable, email: string) => {
+    const result = await client.query<UserRow>(`select ${selectUserColumns} from users where email = ? limit 1 for update`, [email]);
+    return result.rows[0] ? toPrivateRecord(result.rows[0]) : null;
+  },
+
   findById: async (id: string) => {
     const result = await query<UserRow>(`select ${selectUserColumns} from users where id = ? limit 1`, [id]);
     return result.rows[0] ? toPublicRecord(result.rows[0]) : null;
@@ -152,6 +178,64 @@ export const userRepository = {
     const result = await client.query<UserRow>(`select ${selectUserColumns} from users where id = ? limit 1 for update`, [id]);
     if (!result.rows[0]) throw notFound("User not found.");
     return toPrivateRecord(result.rows[0]);
+  },
+
+  setEmailVerificationChallenge: async (client: Queryable, input: { id: string; codeHash: string; expiresAt: Date }) => {
+    const result = await client.query<UserRow>(
+      `update users
+       set email_verification_status = 'pending',
+           email_verification_code_hash = ?,
+           email_verification_expires_at = ?,
+           email_verification_attempts = 0
+       where id = ?
+       returning ${selectUserColumns}`,
+      [input.codeHash, input.expiresAt, input.id]
+    );
+    return toPrivateRecord(result.rows[0]);
+  },
+
+  incrementEmailVerificationAttempts: async (client: Queryable, id: string) => {
+    const result = await client.query<UserRow>(
+      `update users
+       set email_verification_attempts = email_verification_attempts + 1
+       where id = ?
+       returning ${selectUserColumns}`,
+      [id]
+    );
+    return toPrivateRecord(result.rows[0]);
+  },
+
+  markEmailVerified: async (client: Queryable, id: string) => {
+    const result = await client.query<UserRow>(
+      `update users
+       set email_verification_status = 'verified',
+           email_verified_at = coalesce(email_verified_at, current_timestamp),
+           email_verification_code_hash = null,
+           email_verification_expires_at = null,
+           email_verification_attempts = 0
+       where id = ?
+       returning ${selectUserColumns}`,
+      [id]
+    );
+    return toPublicRecord(result.rows[0]);
+  },
+
+  upsertNativeStaffUser: async (client: Queryable, input: { email: string; passwordHash: string; primaryRole: UserRole; fullName?: string | null }) => {
+    await client.query(
+      `insert into users (email, password_hash, full_name, primary_role, verification_status, email_verification_status, email_verified_at, is_profile_locked)
+       values (?, ?, ?, ?, 'verified', 'verified', current_timestamp, false)
+       on duplicate key update
+         password_hash = values(password_hash),
+         full_name = values(full_name),
+         primary_role = values(primary_role),
+         verification_status = 'verified',
+         email_verification_status = 'verified',
+         email_verified_at = coalesce(email_verified_at, current_timestamp),
+         is_profile_locked = false`,
+      [input.email, input.passwordHash, input.fullName ?? null, input.primaryRole]
+    );
+    const result = await client.query<UserRow>(`select ${selectUserColumns} from users where email = ? limit 1`, [input.email]);
+    return toPublicRecord(result.rows[0]);
   },
 
   touchLogin: async (client: Queryable, id: string) => {

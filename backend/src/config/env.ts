@@ -51,6 +51,13 @@ const parsePositiveInteger = (value: string | undefined, fallback: number, name:
   return parsed;
 };
 
+const parseOptionalPort = (value: string | undefined) => {
+  if (value === undefined || value.trim() === "") return undefined;
+  const parsed = Number(value);
+  if (!Number.isInteger(parsed) || parsed < 1 || parsed > 65535) throw new Error("SMTP_PORT must be an integer between 1 and 65535.");
+  return parsed;
+};
+
 export const env = {
   apiName: process.env.API_NAME ?? "Galaxy Elite Private Match API",
   corsOrigin: parseCorsOrigins(process.env.CORS_ORIGIN),
@@ -71,5 +78,12 @@ export const env = {
   notificationWebhookSecret: process.env.NOTIFICATION_WEBHOOK_SECRET,
   emailFrom: process.env.EMAIL_FROM ?? "Galaxy Elite <notifications@galaxy-elite.local>",
   resendApiKey: process.env.RESEND_API_KEY,
+  smtpHost: process.env.SMTP_HOST,
+  smtpPort: parseOptionalPort(process.env.SMTP_PORT),
+  smtpSecure: parseBoolean(process.env.SMTP_SECURE, true),
+  smtpUser: process.env.SMTP_USER,
+  smtpPassword: process.env.SMTP_PASSWORD,
+  smtpFrom: process.env.SMTP_FROM ?? process.env.EMAIL_FROM ?? "Galaxy Elite <notifications@galaxy-elite.local>",
+  emailVerificationTtlMinutes: parsePositiveInteger(process.env.EMAIL_VERIFICATION_TTL_MINUTES, 15, "EMAIL_VERIFICATION_TTL_MINUTES"),
   adminNotificationEmails: parseList(process.env.ADMIN_NOTIFICATION_EMAILS)
 } as const;

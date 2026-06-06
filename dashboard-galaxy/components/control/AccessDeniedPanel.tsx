@@ -14,7 +14,7 @@ export function AccessDeniedPanel({ title = 'SuperAdmin access required.' }: { t
         <div className="dashboard-hero admin-hero access-denied-panel">
           <p className="eyebrow">Access denied</p>
           <h1>{title}</h1>
-          <p>This route is restricted to backend staff tokens with the <code>super_admin</code> role. No taxonomy or audit data was requested.</p>
+          <p>This route is restricted to backend staff sessions with the <code>super_admin</code> role. No taxonomy or audit data was requested.</p>
         </div>
       </div>
     </section>

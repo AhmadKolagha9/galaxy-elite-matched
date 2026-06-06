@@ -194,7 +194,7 @@ export const nativeAuthService = {
     });
 
     if (user) await sendCode(user, code);
-    return { ok: true, message: "If the account is pending verification, a new code has been sent." };
+    return { ok: true, message: "If the account is pending verification, a new code has been sent. Use the latest code from your inbox." };
   },
 
   requestPasswordReset: async (input: { email: string }) => {

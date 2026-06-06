@@ -97,8 +97,9 @@ export function EmailVerificationForm({ initialEmail }: { initialEmail: string }
         }),
         'Could not resend verification code.'
       )
+      setEmail(nextEmail)
       setState('sent')
-      setMessage(body.message || 'If the account is pending verification, a new code has been sent.')
+      setMessage(body.message || 'If the account is pending verification, a new code has been sent. Use the latest code from your inbox.')
     } catch (caught) {
       setState('error')
       setMessage(caught instanceof Error ? caught.message : 'Could not resend verification code.')
@@ -116,7 +117,7 @@ export function EmailVerificationForm({ initialEmail }: { initialEmail: string }
         {state === 'loading' ? 'Verifying...' : 'Verify Email'}
       </button>
       <button className="button button-outline" type="button" onClick={resendCode} disabled={busy}>
-        {state === 'resending' ? 'Sending...' : 'Resend Code'}
+        {state === 'resending' ? 'Sending...' : state === 'sent' ? 'Send Another Code' : 'Resend Code'}
       </button>
     </form>
   )

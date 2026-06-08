@@ -11,12 +11,13 @@ Move agent onboarding out of the public header and into the authenticated accoun
 ## Member Workflow
 - The page requires a native backend session.
 - Show saved account name/email from the backend session.
-- Allow business fields: company name, broker licence number, country, notes.
+- Allow business fields: optional company name, broker licence number, country dropdown, notes.
 - Required documents before Send:
   - `owner_id` for identity proof if not already uploaded for this agent request.
   - `broker_licence` for licence proof.
 - `Save` creates or updates a draft application.
 - `Send` freezes the application into `pending_review` and sends it to admin review.
+- Approved agent applications remain editable. Any saved change after approval becomes a draft update, and sending it again creates a new admin review request before updated agent details are treated as approved.
 - Uploaded files use existing private signed-upload URLs and are saved under the authenticated user's private namespace.
 
 ## Backend Workflow

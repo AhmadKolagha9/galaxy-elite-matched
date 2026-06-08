@@ -1,6 +1,7 @@
 "use client"
 
 import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from 'react'
+import { countryOptions } from '@/lib/taxonomy'
 
 type AgentStatus = 'draft' | 'pending_review' | 'approved' | 'rejected'
 type DocumentType = 'owner_id' | 'broker_licence'
@@ -8,7 +9,7 @@ type UiState = 'idle' | 'loading' | 'saving' | 'sending' | 'sent' | 'error'
 
 type AgentApplication = {
   id: string
-  companyName: string
+  companyName?: string | null
   brokerLicenceNumber: string
   country: string
   notes?: string | null
@@ -50,7 +51,7 @@ type UploadedDocument = {
 }
 
 const fileSlots: { type: DocumentType; label: string; help: string }[] = [
-  { type: 'owner_id', label: 'ID document', help: 'Passport, Emirates ID, or government ID.' },
+  { type: 'owner_id', label: 'ID/Passport document', help: 'Passport, Emirates ID, or government ID.' },
   { type: 'broker_licence', label: 'Broker licence', help: 'Current licence showing broker authority.' }
 ]
 const allowedMimeTypes = ['application/pdf', 'image/png', 'image/jpeg']
@@ -88,7 +89,7 @@ export function AgentApplicationForm() {
   const [uiState, setUiState] = useState<UiState>('loading')
   const [message, setMessage] = useState('')
 
-  const locked = status === 'pending_review' || status === 'approved' || uiState === 'saving' || uiState === 'sending'
+  const locked = status === 'pending_review' || uiState === 'saving' || uiState === 'sending'
   const documentState = useMemo(() => ({
     owner_id: documents.some((document) => document.documentType === 'owner_id') || Boolean(files.owner_id),
     broker_licence: documents.some((document) => document.documentType === 'broker_licence') || Boolean(files.broker_licence)
@@ -137,7 +138,7 @@ export function AgentApplicationForm() {
   }
 
   function payload() {
-    return { companyName: companyName.trim(), brokerLicenceNumber: brokerLicenceNumber.trim(), country: country.trim(), notes: notes.trim() }
+    return { companyName: companyName.trim() || null, brokerLicenceNumber: brokerLicenceNumber.trim(), country: country.trim(), notes: notes.trim() }
   }
 
   async function saveApplication(event?: FormEvent<HTMLFormElement>) {
@@ -218,13 +219,15 @@ export function AgentApplicationForm() {
   return (
     <form className="agent-application-form" onSubmit={saveApplication}>
       <div className="verification-status-pill" data-state={status === 'approved' ? 'submitted' : uiState}>
-        {status === 'approved' ? 'Approved agent account' : status === 'pending_review' ? 'Application sent for admin review' : status === 'rejected' ? 'Application needs updates' : 'Draft application'}
+        Request status: {status === 'approved' ? 'Approved agent account' : status === 'pending_review' ? 'Pending admin review' : status === 'rejected' ? 'Changes requested' : 'Draft'}
       </div>
 
+      {status === 'approved' ? <p className="form-note">Your account is approved as an agent. Editing and sending this form creates a new admin review request for the updated details.</p> : null}
+
       <div className="form-grid">
-        <label>Company name<input value={companyName} onChange={(event) => setCompanyName(event.target.value)} disabled={locked} required maxLength={255} /></label>
+        <label>Company name <span className="optional-label">Optional</span><input value={companyName} onChange={(event) => setCompanyName(event.target.value)} disabled={locked} maxLength={255} /></label>
         <label>Broker licence number<input value={brokerLicenceNumber} onChange={(event) => setBrokerLicenceNumber(event.target.value)} disabled={locked} required maxLength={120} /></label>
-        <label>Country<input value={country} onChange={(event) => setCountry(event.target.value)} disabled={locked} required maxLength={120} /></label>
+        <label>Country<select value={country} onChange={(event) => setCountry(event.target.value)} disabled={locked} required><option value="" disabled>Select country</option>{countryOptions.map((option) => <option key={option} value={option}>{option}</option>)}</select></label>
         <label>Notes<textarea rows={4} value={notes} onChange={(event) => setNotes(event.target.value)} disabled={locked} maxLength={1000} /></label>
       </div>
 
@@ -250,7 +253,7 @@ export function AgentApplicationForm() {
           {uiState === 'saving' ? 'Saving...' : 'Save'}
         </button>
         <button className="button button-gold" type="button" onClick={sendApplication} disabled={locked || !readyToSend}>
-          {uiState === 'sending' ? 'Sending...' : status === 'pending_review' ? 'Sent' : 'Send'}
+          {uiState === 'sending' ? 'Sending...' : status === 'pending_review' ? 'Sent' : status === 'approved' ? 'Send Updated Request' : 'Send'}
         </button>
       </div>
     </form>

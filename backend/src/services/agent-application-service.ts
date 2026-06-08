@@ -10,7 +10,7 @@ import { userRepository, type IdentityVerificationDocumentInput } from "../repos
 const requiredDocumentTypes = new Set<DocumentType>(["owner_id", "broker_licence"]);
 
 type AgentApplicationPayload = {
-  companyName: string;
+  companyName?: string | null;
   brokerLicenceNumber: string;
   country: string;
   notes?: string | null;
@@ -27,6 +27,12 @@ const cleanText = (value: string, label: string, maxLength: number) => {
   return text;
 };
 
+const cleanOptionalText = (value: string | null | undefined, label: string, maxLength: number) => {
+  const text = value?.trim() ?? "";
+  if (text.length > maxLength) throw badRequest(`${label} must be ${maxLength} characters or less.`);
+  return text || null;
+};
+
 const cleanNotes = (value?: string | null) => {
   const text = value?.trim() ?? "";
   if (text.length > 1000) throw badRequest("Notes must be 1000 characters or less.");
@@ -35,7 +41,7 @@ const cleanNotes = (value?: string | null) => {
 
 const normalizePayload = (actor: AuthPrincipal, input: AgentApplicationPayload) => ({
   userId: actor.id,
-  companyName: cleanText(input.companyName, "company_name", 255),
+  companyName: cleanOptionalText(input.companyName, "company_name", 255),
   brokerLicenceNumber: cleanText(input.brokerLicenceNumber, "broker_licence_number", 120),
   country: cleanText(input.country, "country", 120),
   notes: cleanNotes(input.notes)

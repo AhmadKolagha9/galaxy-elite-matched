@@ -7,7 +7,7 @@ export type AgentApplicationStatus = "draft" | "pending_review" | "approved" | "
 
 export type AgentApplicationInput = {
   userId: string;
-  companyName: string;
+  companyName?: string | null;
   brokerLicenceNumber: string;
   country: string;
   notes?: string | null;
@@ -44,7 +44,7 @@ export type AgentApplicationDocument = {
 type AgentApplicationRow = {
   id: string;
   user_id: string;
-  company_name: string;
+  company_name: string | null;
   broker_licence_number: string;
   country: string;
   notes: string | null;
@@ -109,7 +109,7 @@ const toIso = (value: string | Date | null | undefined) => value ? new Date(valu
 const toRecord = (row: AgentApplicationRow): AgentApplicationRecord => ({
   id: row.id,
   userId: row.user_id,
-  companyName: row.company_name,
+  companyName: row.company_name ?? null,
   brokerLicenceNumber: row.broker_licence_number,
   country: row.country,
   notes: row.notes,
@@ -165,8 +165,11 @@ export const agentApplicationRepository = {
              broker_licence_number = ?,
              country = ?,
              notes = ?,
-             status = case when status in ('approved', 'pending_review') then status else 'draft' end,
-             review_note = case when status = 'rejected' then null else review_note end
+             status = case when status = 'pending_review' then status else 'draft' end,
+             review_note = case when status = 'pending_review' then review_note else null end,
+             reviewed_by = case when status = 'pending_review' then reviewed_by else null end,
+             reviewed_at = case when status = 'pending_review' then reviewed_at else null end,
+             submitted_at = case when status = 'pending_review' then submitted_at else null end
          where user_id = ?
          returning ${applicationColumns}`,
         [input.companyName, input.brokerLicenceNumber, input.country, input.notes ?? null, input.userId]

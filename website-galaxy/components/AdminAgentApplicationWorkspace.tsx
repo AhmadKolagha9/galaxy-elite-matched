@@ -68,7 +68,7 @@ export function AdminAgentApplicationWorkspace({ id }: { id: string }) {
           <h2>{app.user?.email || app.userId}</h2>
           <dl>
             <div><dt>Applicant</dt><dd>{app.user?.fullName || 'Not provided'}</dd></div>
-            <div><dt>Company</dt><dd>{app.companyName}</dd></div>
+            <div><dt>Company</dt><dd>{app.companyName || 'Not provided'}</dd></div>
             <div><dt>Broker licence</dt><dd>{app.brokerLicenceNumber}</dd></div>
             <div><dt>Country</dt><dd>{app.country}</dd></div>
             <div><dt>Current role</dt><dd>{app.user?.primaryRole || 'user'}</dd></div>

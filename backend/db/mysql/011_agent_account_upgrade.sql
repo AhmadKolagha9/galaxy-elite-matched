@@ -3,7 +3,7 @@
 create table if not exists agent_applications (
   id char(36) primary key default (uuid()),
   user_id char(36) not null,
-  company_name varchar(255) not null,
+  company_name varchar(255) null,
   broker_licence_number varchar(120) not null,
   country varchar(120) not null,
   notes text null,

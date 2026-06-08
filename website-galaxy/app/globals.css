@@ -549,3 +549,5 @@ button:disabled, select:disabled, input:disabled { cursor: not-allowed; opacity:
 @media (max-width: 980px) {
   .agent-document-grid, .agent-table-row { grid-template-columns: 1fr; }
 }
+
+.optional-label { color: var(--muted); font-size: 12px; font-weight: 850; margin-left: 6px; }

@@ -61,7 +61,7 @@ export function AdminAgentApplicationTable() {
         {sortedRows.length ? sortedRows.map((row) => (
           <div className="identity-table-row agent-table-row identity-row-priority" role="row" key={row.id}>
             <strong>{row.user?.email || row.userId}</strong>
-            <span>{row.companyName}</span>
+            <span>{row.companyName || 'Not provided'}</span>
             <span>{row.brokerLicenceNumber}</span>
             <span>{row.country}</span>
             <span className="status status-priority">{row.documentCount || 0}</span>

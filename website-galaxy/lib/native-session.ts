@@ -27,6 +27,8 @@ type BackendProfileResponse = {
     roles?: string[]
     primaryRole?: string
     primary_role?: string
+    fullName?: string | null
+    full_name?: string | null
     verificationLevel?: string
     verification_level?: string
     profile?: {
@@ -132,8 +134,8 @@ async function getValidatedBackendJwtPayloadFromToken(token: string): Promise<Ba
     primary_role: primaryRole,
     verification_level: verificationLevel,
     verification_status: stringValue(claims.verification_status) || decoded.verification_status || verificationLevel,
-    name: stringValue(claims.name) || stringValue(claims.full_name) || user.profile?.fullName || user.profile?.full_name || decoded.name || decoded.full_name,
-    full_name: stringValue(claims.full_name) || user.profile?.fullName || user.profile?.full_name || decoded.full_name || decoded.name,
+    name: user.fullName || user.full_name || user.profile?.fullName || user.profile?.full_name || stringValue(claims.name) || stringValue(claims.full_name) || decoded.name || decoded.full_name,
+    full_name: user.fullName || user.full_name || user.profile?.fullName || user.profile?.full_name || stringValue(claims.full_name) || decoded.full_name || decoded.name,
     verification_review_note: stringValue(claims.verification_review_note) || decoded.verification_review_note,
     review_note: stringValue(claims.review_note) || decoded.review_note,
     exp: decoded.exp

@@ -1,10 +1,25 @@
 'use client'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { mainNav, site } from '@/lib/site'
 import { useMemberSession } from '@/lib/member-session-client'
 
 const protectedPaths = new Set(['/post-interest', '/private-availability', '/investor-post'])
+
+
+function initials(name: string, email: string) {
+  const source = name || email
+  const parts = source.split(/[\s@._-]+/).filter(Boolean)
+  return parts.slice(0, 2).map((part) => part[0]?.toUpperCase()).join('') || 'U'
+}
+
+function verificationLabel(status?: string) {
+  if (status === 'verified') return 'Verified account'
+  if (status === 'under_review') return 'Verification under review'
+  if (status === 'action_required') return 'Verification action required'
+  return 'Verification needed'
+}
 
 function authAwareHref(href: string, authenticated: boolean) {
   if (authenticated || !protectedPaths.has(href)) return href
@@ -12,8 +27,15 @@ function authAwareHref(href: string, authenticated: boolean) {
 }
 
 export function Header() {
+  const router = useRouter()
   const { user, loading } = useMemberSession()
   const authenticated = Boolean(user)
+
+  async function logout() {
+    await fetch('/api/auth/logout', { method: 'POST' }).catch(() => null)
+    router.replace('/')
+    router.refresh()
+  }
 
   return (
     <header className="site-header">
@@ -33,8 +55,26 @@ export function Header() {
         ))}
       </nav>
       <div className="header-actions">
-        {authenticated ? (
-          <Link className="button button-small button-gold" href="/dashboard">Go to Dashboard</Link>
+        {authenticated && user ? (
+          <details className="account-menu">
+            <summary className="account-menu-trigger" aria-label="Open account menu">
+              <span className="account-avatar">{initials(user.name, user.email)}</span>
+              <span className="account-menu-text">
+                <span>{user.name}</span>
+                <small>{user.role}</small>
+              </span>
+              <span className={user.verificationStatus === 'verified' ? 'account-verified-badge' : 'account-status-badge'} title={verificationLabel(user.verificationStatus)}>
+                {user.verificationStatus === 'verified' ? 'V' : '!'}
+              </span>
+            </summary>
+            <div className="account-menu-panel">
+              <Link href="/dashboard">Dashboard</Link>
+              <Link href="/dashboard/profile">Manage Profile</Link>
+              <Link href="/dashboard/verify">Upload ID / Verify</Link>
+              <Link href="/forgot-password">Change Password</Link>
+              <button type="button" onClick={logout}>Sign out</button>
+            </div>
+          </details>
         ) : (
           <>
             <Link className="ghost-link" href="/login">Login</Link>

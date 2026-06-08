@@ -67,6 +67,73 @@ img { max-width: 100%; height: auto; }
 .header-actions { display: flex; gap: 10px; align-items: center; }
 .ghost-link { color: rgba(255, 250, 240, 0.90); font-weight: 800; font-size: 14px; }
 
+.account-menu { position: relative; }
+.account-menu summary { list-style: none; }
+.account-menu summary::-webkit-details-marker { display: none; }
+.account-menu-trigger {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px 6px 6px;
+  border-radius: 999px;
+  border: 1px solid rgba(245,223,170,.26);
+  background: rgba(255,255,255,.06);
+  color: white;
+  cursor: pointer;
+}
+.account-avatar {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--gradient-gold);
+  color: #160f06;
+  font-size: 12px;
+  font-weight: 950;
+}
+.account-menu-text { display: grid; line-height: 1.1; min-width: 0; }
+.account-menu-text span { max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; font-weight: 900; }
+.account-menu-text small { color: #cdd8e6; font-size: 11px; font-weight: 800; text-transform: capitalize; }
+.account-verified-badge, .account-status-badge {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 950;
+}
+.account-verified-badge { background: rgba(43,182,115,.18); color: #96f0bd; border: 1px solid rgba(43,182,115,.36); }
+.account-status-badge { background: rgba(245,223,170,.14); color: var(--gold-soft); border: 1px solid rgba(245,223,170,.30); }
+.account-menu-panel {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 10px);
+  width: 230px;
+  display: grid;
+  gap: 4px;
+  padding: 10px;
+  border-radius: 18px;
+  background: white;
+  border: 1px solid rgba(8,17,31,.12);
+  box-shadow: var(--shadow);
+  z-index: 80;
+}
+.account-menu-panel a, .account-menu-panel button {
+  width: 100%;
+  border: 0;
+  border-radius: 12px;
+  padding: 11px 12px;
+  background: transparent;
+  color: var(--ink);
+  text-align: left;
+  font-weight: 850;
+  cursor: pointer;
+}
+.account-menu-panel a:hover, .account-menu-panel button:hover { background: var(--cream); color: var(--gold-deep); }
+
 .button {
   display: inline-flex;
   align-items: center;

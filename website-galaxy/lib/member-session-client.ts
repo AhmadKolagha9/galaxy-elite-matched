@@ -7,6 +7,7 @@ export type MemberSessionUser = {
   email: string
   name: string
   role: string
+  verificationStatus?: string
 }
 
 export function useMemberSession() {

@@ -34,9 +34,9 @@ async function readAuthResponse(response: Response, fallback: string): Promise<A
   return body && typeof body === 'object' ? body as AuthResponse : { ok: true }
 }
 
-export function ForgotPasswordForm() {
+export function ForgotPasswordForm({ initialEmail = '' }: { initialEmail?: string }) {
   const apiBase = useMemo(() => backendApiUrl(), [])
-  const [email, setEmail] = useState('')
+  const [email, setEmail] = useState(initialEmail)
   const [state, setState] = useState<SubmitState>('idle')
   const [message, setMessage] = useState('')
 

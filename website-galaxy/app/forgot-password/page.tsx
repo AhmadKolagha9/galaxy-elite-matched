@@ -10,13 +10,14 @@ export const metadata: Metadata = pageMetadata({
   noindex: true
 })
 
-export default function ForgotPasswordPage() {
+export default async function ForgotPasswordPage({ searchParams }: { searchParams: Promise<{ email?: string }> }) {
+  const params = await searchParams
   return (
     <section className="auth-section">
       <div className="auth-panel">
         <p className="eyebrow">Password reset</p>
         <h1>Request a secure reset code.</h1>
-        <ForgotPasswordForm />
+        <ForgotPasswordForm initialEmail={params.email || ''} />
         <p>Remember your password? <Link href="/login"><strong>Login</strong></Link></p>
       </div>
       <aside className="auth-aside">

@@ -67,6 +67,8 @@ const signUserToken = (user: NativeUserRecord) => {
     {
       sub: user.id,
       email: user.email,
+      name: user.fullName ?? user.email.split("@")[0],
+      full_name: user.fullName ?? undefined,
       roles,
       role: user.primaryRole,
       primary_role: user.primaryRole,
@@ -245,6 +247,62 @@ export const nativeAuthService = {
     });
 
     return { ok: true, user: publicUser, ...signUserToken(publicUser) };
+  },
+
+  updateProfile: async (input: { userId: string; email: string; fullName?: string }) => {
+    const email = normalizeEmail(input.email);
+    const fullName = (input.fullName ?? "").trim();
+    if (!emailPattern.test(email)) throw badRequest("Email must be valid.");
+    if (!fullName) throw badRequest("Full name is required.");
+    if (fullName.length > 160) throw badRequest("Full name must be 160 characters or less.");
+
+    const verificationCode = generateVerificationCode();
+    let shouldSendVerificationCode = false;
+
+    try {
+      const publicUser = await withTransaction(async (client) => {
+        const current = await userRepository.findByIdForUpdate(client, input.userId);
+        const emailChanged = current.email.toLowerCase() !== email;
+        if (emailChanged) {
+          emailService.assertConfigured();
+          const existing = await userRepository.findPrivateByEmailForUpdate(client, email);
+          if (existing && existing.id !== current.id) throw badRequest("A user with this email already exists.");
+        }
+
+        let updated = await userRepository.updateAccountProfile(client, {
+          id: current.id,
+          email,
+          fullName
+        });
+
+        if (emailChanged) {
+          updated = safeUser(await userRepository.setEmailVerificationChallenge(client, {
+            id: current.id,
+            codeHash: codeHash(email, verificationCode),
+            expiresAt: expiresAt()
+          }));
+          shouldSendVerificationCode = true;
+        }
+
+        await userRepository.upsertProfile(client, updated);
+        await userRepository.ensureRoles(client, updated.id, updated.primaryRole);
+        return updated;
+      });
+
+      if (shouldSendVerificationCode) await sendCode(publicUser, verificationCode);
+      return {
+        ok: true,
+        user: publicUser,
+        emailVerificationRequired: shouldSendVerificationCode,
+        message: shouldSendVerificationCode
+          ? "Profile updated. Check your new email for the verification code."
+          : "Profile updated.",
+        ...signUserToken(publicUser)
+      };
+    } catch (error) {
+      if (isDuplicateKey(error)) throw badRequest("A user with this email already exists.");
+      throw error;
+    }
   },
 
   login: async (input: { email: string; password: string }) => {

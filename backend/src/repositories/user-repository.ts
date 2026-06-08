@@ -192,6 +192,18 @@ export const userRepository = {
     return toPrivateRecord(result.rows[0]);
   },
 
+  updateAccountProfile: async (client: Queryable, input: { id: string; email: string; fullName?: string | null }) => {
+    const result = await client.query<UserRow>(
+      `update users
+       set email = ?,
+           full_name = ?
+       where id = ?
+       returning ${selectUserColumns}`,
+      [input.email, input.fullName ?? null, input.id]
+    );
+    return toPublicRecord(result.rows[0]);
+  },
+
   setEmailVerificationChallenge: async (client: Queryable, input: { id: string; codeHash: string; expiresAt: Date }) => {
     const result = await client.query<UserRow>(
       `update users

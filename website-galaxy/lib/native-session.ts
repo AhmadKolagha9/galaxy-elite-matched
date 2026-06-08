@@ -14,6 +14,8 @@ export type BackendJwtPayload = {
   verification_status?: string
   verification_review_note?: string
   review_note?: string
+  name?: string
+  full_name?: string
   exp?: number
 }
 
@@ -27,6 +29,10 @@ type BackendProfileResponse = {
     primary_role?: string
     verificationLevel?: string
     verification_level?: string
+    profile?: {
+      fullName?: string
+      full_name?: string
+    }
     customClaims?: Record<string, unknown>
   }
 }
@@ -126,6 +132,8 @@ async function getValidatedBackendJwtPayloadFromToken(token: string): Promise<Ba
     primary_role: primaryRole,
     verification_level: verificationLevel,
     verification_status: stringValue(claims.verification_status) || decoded.verification_status || verificationLevel,
+    name: stringValue(claims.name) || stringValue(claims.full_name) || user.profile?.fullName || user.profile?.full_name || decoded.name || decoded.full_name,
+    full_name: stringValue(claims.full_name) || user.profile?.fullName || user.profile?.full_name || decoded.full_name || decoded.name,
     verification_review_note: stringValue(claims.verification_review_note) || decoded.verification_review_note,
     review_note: stringValue(claims.review_note) || decoded.review_note,
     exp: decoded.exp
@@ -176,7 +184,7 @@ export async function getBackendUser(): Promise<AppUser | null> {
   return {
     id: payload.sub,
     email: payload.email,
-    name: payload.email.split('@')[0],
+    name: payload.full_name || payload.name || payload.email.split('@')[0],
     role,
     provider: 'backend'
   }

@@ -519,3 +519,18 @@ button:disabled, select:disabled, input:disabled { cursor: not-allowed; opacity:
   .identity-workspace, .identity-workspace-split { grid-template-columns: 1fr; }
   .identity-document-card, .identity-grid-toolbar { align-items: stretch; flex-direction: column; }
 }
+
+
+.profile-management-card { display: grid; gap: 16px; margin-bottom: 24px; }
+.profile-management-card h2 { font-size: clamp(26px, 3vw, 38px); }
+.profile-form { display: grid; gap: 14px; }
+.profile-form .form-grid { align-items: end; }
+.profile-form-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.form-note { margin: 0; color: var(--gold-deep); font-weight: 850; }
+.form-status { margin: 0; font-weight: 850; }
+.form-status-success { color: var(--green); }
+.form-status-error { color: var(--red); }
+
+@media (max-width: 680px) {
+  .profile-form-actions { align-items: stretch; flex-direction: column; }
+}

@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { requireUser } from '@/lib/auth'
 import { getBackendJwtPayloadFromCookie, getVerificationState } from '@/lib/native-session'
+import { ProfileDetailsForm } from '@/components/ProfileDetailsForm'
 import { pageMetadata } from '@/lib/seo'
 
 export const metadata: Metadata = pageMetadata({ title: 'Profile', description: 'Private Match profile.', path: '/dashboard/profile', noindex: true })
@@ -29,13 +30,14 @@ export default async function DashboardProfilePage() {
           <Link className="button button-outline" href={`/forgot-password?email=${encodeURIComponent(user.email)}`}>Change Password</Link>
         </div>
       </div>
+      <section className="policy-card profile-management-card">
+        <h2>Account Details</h2>
+        <p>Update the member name and email used for private match communication.</p>
+        <ProfileDetailsForm initialName={user.name} initialEmail={user.email} />
+      </section>
       <div className="policy-grid">
-        <article className="policy-card"><h3>Name</h3><p>{user.name}</p></article>
-        <article className="policy-card"><h3>Email</h3><p>{user.email}</p></article>
         <article className="policy-card"><h3>Role</h3><p>{user.role}</p></article>
         <article className="policy-card"><h3>Verification</h3><p>{verificationCopy(verificationStatus)}</p></article>
-        <article className="policy-card"><h3>Auth mode</h3><p>{user.provider}</p></article>
-        <article className="policy-card"><h3>Edit name</h3><p>Profile name editing will be stored through the backend profile endpoint in the next profile-management release.</p></article>
       </div>
     </>
   )

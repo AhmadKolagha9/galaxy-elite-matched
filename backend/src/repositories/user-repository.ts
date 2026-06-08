@@ -329,6 +329,22 @@ export const userRepository = {
     return toPublicRecord(result.rows[0]);
   },
 
+  promoteToVerifiedAgent: async (client: Queryable, input: { id: string; reviewedBy?: string | null; note?: string | null }) => {
+    const result = await client.query<UserRow>(
+      `update users
+       set primary_role = 'agent',
+           verification_status = 'verified',
+           is_profile_locked = false,
+           verified_at = current_timestamp,
+           verification_reviewed_by = ?,
+           verification_review_note = ?
+       where id = ?
+       returning ${selectUserColumns}`,
+      [input.reviewedBy ?? null, input.note ?? "Agent application approved.", input.id]
+    );
+    return toPublicRecord(result.rows[0]);
+  },
+
   createIdentityVerificationUploads: async (client: Queryable, input: { userId: string; documents: IdentityVerificationDocumentInput[] }) => {
     const uploads = [];
     for (const document of input.documents) {

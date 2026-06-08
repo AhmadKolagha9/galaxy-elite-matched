@@ -9,6 +9,7 @@ import { adminVerificationQueueRouter } from "./verification-queue.js";
 import { adminMatchesRouter } from "./matches.js";
 import { adminMatchRoomsRouter } from "./match-rooms.js";
 import { adminAuditLogRouter } from "./audit-log.js";
+import { adminAgentApplicationsRouter } from "./agent-applications.js";
 
 export const adminRouter = Router();
 
@@ -17,6 +18,7 @@ adminRouter.get("/", requireAdminOrCompliance, (_request, response) => {
 });
 
 adminRouter.use("/submissions", adminSubmissionsRouter);
+adminRouter.use("/agent-applications", adminAgentApplicationsRouter);
 adminRouter.use("/users", adminUsersRouter);
 adminRouter.use("/verification-queue", adminVerificationQueueRouter);
 adminRouter.use("/documents", adminDocumentsRouter);

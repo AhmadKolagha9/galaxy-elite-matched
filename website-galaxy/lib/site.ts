@@ -21,7 +21,6 @@ export const mainNav = [
   { href: '/verified-listing', label: 'Verified Listing' },
   { href: '/investor-post', label: 'Investor Post' },
   { href: '/private-match', label: 'Private Match' },
-  { href: '/for-agents', label: 'Agents' },
   { href: '/market-pulse', label: 'Market Pulse' }
 ]
 
@@ -32,6 +31,7 @@ export const dashboardNav = [
   { href: '/dashboard/investor-post', label: 'Investor Post' },
   { href: '/dashboard/matches', label: 'Matches' },
   { href: '/dashboard/verify', label: 'Verification' },
+  { href: '/dashboard/join-agent', label: 'Join like agent' },
   { href: '/dashboard/profile', label: 'Profile' }
 ]
 

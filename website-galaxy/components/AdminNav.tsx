@@ -6,6 +6,7 @@ const adminLinks = [
   { href: '/admin/approvals', label: 'Approval Queue' },
   { href: '/admin/compliance', label: 'Compliance Vault' },
   { href: '/admin/compliance/identities', label: 'Identity Review' },
+  { href: '/admin/compliance/agents', label: 'Agent Review' },
   { href: '/admin/taxonomy', label: 'Dropdowns / Taxonomy' },
   { href: '/dashboard', label: 'Member Dashboard' }
 ]

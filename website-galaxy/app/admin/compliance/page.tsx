@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { AdminSubmissionCard } from '@/components/AdminSubmissionCard'
 import { getCollection } from '@/lib/admin-store'
 import { pageMetadata } from '@/lib/seo'
@@ -12,6 +13,10 @@ export default async function CompliancePage() {
   return (
     <>
       <div className="dashboard-hero admin-hero"><p className="eyebrow">Compliance vault</p><h1>Strict verification before verified listing visibility.</h1><p>Property, land, office, camp, off-plan and secondary requests must pass ownership, authority, ID and permit checks where applicable.</p></div>
+      <div className="admin-quick-actions">
+        <Link className="button button-outline" href="/admin/compliance/agents">Open Agent Review</Link>
+        <Link className="button button-outline" href="/admin/compliance/identities">Open Identity Review</Link>
+      </div>
       <section className="admin-section">
         <div className="section-heading-inline"><h2>Required document checklist</h2><span>{verificationDocumentTypes.length} checks</span></div>
         <div className="document-checklist">{verificationDocumentTypes.map((doc) => <span key={doc}>{doc}</span>)}</div>

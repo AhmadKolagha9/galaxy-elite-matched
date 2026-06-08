@@ -71,6 +71,7 @@ export function Header() {
               <Link href="/dashboard">Dashboard</Link>
               <Link href="/dashboard/profile">Manage Profile</Link>
               <Link href="/dashboard/verify">Upload ID / Verify</Link>
+              <Link href="/dashboard/join-agent">Join like agent</Link>
               <Link href="/forgot-password">Change Password</Link>
               <button type="button" onClick={logout}>Sign out</button>
             </div>

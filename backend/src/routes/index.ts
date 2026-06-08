@@ -3,6 +3,7 @@ import { Router } from "express";
 import { optionalAuth } from "../middleware/auth.js";
 import { verifyClaims } from "../middleware/verify-claims.js";
 import { adminRouter } from "./admin/index.js";
+import { agentApplicationsRouter } from "./agent-applications.js";
 import { authRouter } from "./auth.js";
 import { healthRouter } from "./health.js";
 import { matchRoomsRouter } from "./match-rooms.js";
@@ -19,6 +20,7 @@ export const apiRouter = Router();
 
 apiRouter.use("/health", healthRouter);
 apiRouter.use("/auth", authRouter);
+apiRouter.use("/agent-applications", optionalAuth, agentApplicationsRouter);
 apiRouter.use(submissionsRouter);
 apiRouter.use("/profile", optionalAuth, profileRouter);
 apiRouter.use("/users", optionalAuth, usersRouter);

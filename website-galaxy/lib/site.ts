@@ -18,7 +18,6 @@ export const mainNav = [
   { href: '/interest-board', label: 'Interest Board' },
   { href: '/private-opportunities', label: 'Private Opportunities' },
   { href: '/verified-listing', label: 'Verified Listing' },
-  { href: '/private-match', label: 'Private Match' },
   { href: '/market-pulse', label: 'Market Pulse' }
 ]
 

@@ -21,7 +21,6 @@ export function Footer() {
           <Link href="/post-interest">Post Interest</Link>
           <Link href="/interest-board">Interest Board</Link>
           <Link href="/private-opportunities">Private Opportunities</Link>
-          <Link href="/private-match">Private Match</Link>
         </div>
         <div>
           <h3>Markets</h3>

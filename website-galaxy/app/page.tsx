@@ -92,7 +92,6 @@ export default function HomePage() {
           <p className="eyebrow">How it works</p>
           <h2>From intention to agreement, every stage is controlled.</h2>
           <p>Private matching feels like a relationship platform, but backed by brokerage process, verification and clear status tracking.</p>
-          <Link href="/private-match" className="button button-gold">See the workflow</Link>
         </div>
         <div className="steps compact-steps">
           {processSteps.map(([title, text], index) => (

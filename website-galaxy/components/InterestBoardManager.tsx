@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 type MyInterestPost = {
   id: string
   title: string
+  referenceCode: string
   country: string
   areaCity: string
   propertyType: string
@@ -26,7 +27,7 @@ type InterestMatchRequest = {
   ownerNote?: string | null
   adminNote?: string | null
   createdAt: string
-  interest: { title: string; country: string; areaCity: string; propertyType: string }
+  interest: { title: string; referenceCode: string; country: string; areaCity: string; propertyType: string }
   requester?: { email?: string | null; fullName?: string | null; verificationStatus?: string | null }
   owner?: { email?: string | null; fullName?: string | null }
 }
@@ -152,7 +153,7 @@ export function InterestBoardManager() {
         <div className="interest-manager-list">
           {posts.length ? posts.map((post) => (
             <article className="interest-manager-row" key={post.id}>
-              <div><strong>{post.title}</strong><p>{post.country} / {post.areaCity} / {post.propertyType}</p><span className="status status-matching">{post.approvalStatus} / {post.publicStatus}</span></div>
+              <div><strong>{post.title}</strong><p><span className="reference-code-pill">Ref {post.referenceCode}</span></p><p>{post.country} / {post.areaCity} / {post.propertyType}</p><span className="status status-matching">{post.approvalStatus} / {post.publicStatus}</span></div>
               <div className="manager-actions">
                 <button className="button button-small button-outline" type="button" disabled={Boolean(busyId)} onClick={() => updatePost(post.id, 'publish')}>Publish</button>
                 <button className="button button-small button-outline" type="button" disabled={Boolean(busyId)} onClick={() => updatePost(post.id, 'unpublish')}>Unpublish</button>
@@ -168,7 +169,7 @@ export function InterestBoardManager() {
         <div className="interest-manager-list">
           {received.length ? received.map((request) => (
             <article className="interest-manager-row" key={request.id}>
-              <div><strong>{request.interest.title}</strong><p>{request.requesterRole} / {request.requester?.email || 'Requester'} / {formatDate(request.createdAt)}</p><p>{request.message}</p><span className="status status-matching">{request.status} / {request.adminStatus}</span></div>
+              <div><strong>{request.interest.title}</strong><p><span className="reference-code-pill">Ref {request.interest.referenceCode}</span></p><p>{request.requesterRole} / {request.requester?.email || 'Requester'} / {formatDate(request.createdAt)}</p><p>{request.message}</p><span className="status status-matching">{request.status} / {request.adminStatus}</span></div>
               <div className="manager-actions">
                 <button className="button button-small button-gold" type="button" disabled={Boolean(busyId) || request.status !== 'pending_owner'} onClick={() => ownerDecision(request.id, 'approve')}>Approve</button>
                 <button className="button button-small button-outline" type="button" disabled={Boolean(busyId) || request.status !== 'pending_owner'} onClick={() => ownerDecision(request.id, 'reject')}>Reject</button>
@@ -182,7 +183,7 @@ export function InterestBoardManager() {
         <div className="interest-manager-list">
           {sent.length ? sent.map((request) => (
             <article className="interest-manager-row" key={request.id}>
-              <div><strong>{request.interest.title}</strong><p>{request.requesterRole} / {formatDate(request.createdAt)}</p><p>{request.message}</p><span className="status status-matching">{request.status} / {request.adminStatus}</span></div>
+              <div><strong>{request.interest.title}</strong><p><span className="reference-code-pill">Ref {request.interest.referenceCode}</span></p><p>{request.requesterRole} / {formatDate(request.createdAt)}</p><p>{request.message}</p><span className="status status-matching">{request.status} / {request.adminStatus}</span></div>
               <div className="manager-actions">
                 <button className="button button-small button-outline" type="button" disabled={Boolean(busyId) || !['pending_owner', 'owner_approved', 'admin_review'].includes(request.status)} onClick={() => cancelRequest(request.id)}>Cancel</button>
               </div>

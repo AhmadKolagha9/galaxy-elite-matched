@@ -8,6 +8,7 @@ type InterestCardView = (InterestCardData | PublicInterestCard) & {
   verified?: boolean
   budgetVisibility?: string
   ticketVisibility?: string
+  referenceCode?: string
 }
 
 const privateVisibilityLabels = new Set(['hide publicly', 'hidden publicly', 'verified privately', 'visible to verified landlords only'])
@@ -34,6 +35,7 @@ export function InterestCard({ card }: { card: InterestCardView }) {
         <StatusBadge status={safeCard.status} />
       </div>
       <h3>{safeCard.title}</h3>
+      {safeCard.referenceCode ? <span className="reference-code-pill">Ref {safeCard.referenceCode}</span> : null}
       <dl>
         <div><dt>Country</dt><dd>{safeCard.country}</dd></div>
         <div><dt>Area</dt><dd>{safeCard.area}</dd></div>

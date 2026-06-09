@@ -78,10 +78,15 @@ submissionsRouter.get(
     const records = await listPublicRecords("interest");
     response.json({
       ok: true,
-      records: records.map((record) => ({
-        ...(sanitizeOutput(record) as Record<string, unknown>),
-        public_interest_id: record.id
-      }))
+      records: records.map((record) => {
+        const sanitized = sanitizeOutput(record) as Record<string, unknown>;
+        const data = record.data && typeof record.data === "object" ? record.data as Record<string, unknown> : {};
+        return {
+          ...sanitized,
+          public_interest_id: record.id,
+          reference_code: typeof data.reference_code === "string" ? data.reference_code : undefined
+        };
+      })
     });
   })
 );

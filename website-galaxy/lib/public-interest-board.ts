@@ -10,6 +10,7 @@ export type PublicInterestBoardSearchParams = {
 
 export type PublicInterestCard = {
   id: string
+  referenceCode: string
   status: 'Open' | 'Matching' | 'Matched' | 'Archived'
   badge: string
   title: string
@@ -145,6 +146,7 @@ function rawRecordsFromResponse(body: unknown): RawInterestRecord[] {
 export function toPublicInterestCard(record: RawInterestRecord): PublicInterestCard {
   const fallbackId = firstText(record, ['title'], 'approved-interest').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'approved-interest'
   const id = firstText(record, ['public_interest_id', 'id', 'interest_id', 'uuid'], fallbackId)
+  const referenceCode = firstText(record, ['reference_code', 'referenceCode'], id)
   const verified = lower(record.verification_status ?? record.verificationStatus) === 'verified'
   const area = firstText(record, ['area_city', 'area', 'city'], 'Area available after match')
   const size = firstText(record, ['size', 'size_label']) || `${numberText(record, ['size_sqft']) || 'Flexible'} sq ft`
@@ -152,6 +154,7 @@ export function toPublicInterestCard(record: RawInterestRecord): PublicInterestC
 
   return {
     id,
+    referenceCode,
     status: publicStatus(record),
     badge: anonymousRoleLabel(record.user_role ?? record.userRole),
     title: firstText(record, ['title'], 'Approved demand profile'),

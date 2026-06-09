@@ -27,6 +27,7 @@ export type InterestMatchRequestRecord = {
   updatedAt: string;
   interest: {
     title: string;
+    referenceCode: string;
     country: string;
     areaCity: string;
     propertyType: string;
@@ -49,6 +50,7 @@ type InterestRow = {
   id: string;
   user_id: string;
   title: string;
+  reference_code: string;
   country: string;
   area_city: string;
   property_type: string;
@@ -76,6 +78,7 @@ type InterestMatchRequestRow = {
   created_at: string | Date;
   updated_at: string | Date;
   interest_title: string;
+  interest_reference_code: string;
   interest_country: string;
   interest_area_city: string;
   interest_property_type: string;
@@ -93,7 +96,7 @@ type MyInterestRow = InterestRow & {
   incoming_request_count: string | number;
 };
 
-const interestColumns = "id, user_id, title, country, area_city, property_type, market_segment, approval_status, public_status, verification_status, created_at, updated_at";
+const interestColumns = "id, user_id, title, reference_code, country, area_city, property_type, market_segment, approval_status, public_status, verification_status, created_at, updated_at";
 const requestColumns = `
   imr.id,
   imr.interest_signal_id,
@@ -110,6 +113,7 @@ const requestColumns = `
   imr.created_at,
   imr.updated_at,
   i.title as interest_title,
+  i.reference_code as interest_reference_code,
   i.country as interest_country,
   i.area_city as interest_area_city,
   i.property_type as interest_property_type,
@@ -135,6 +139,7 @@ const toIso = (value: string | Date | null | undefined) => value ? new Date(valu
 const toInterestSummary = (row: MyInterestRow) => ({
   id: row.id,
   title: row.title,
+  referenceCode: row.reference_code,
   country: row.country,
   areaCity: row.area_city,
   propertyType: row.property_type,
@@ -164,6 +169,7 @@ const toRecord = (row: InterestMatchRequestRow): InterestMatchRequestRecord => (
   updatedAt: toIso(row.updated_at)!,
   interest: {
     title: row.interest_title,
+    referenceCode: row.interest_reference_code,
     country: row.interest_country,
     areaCity: row.interest_area_city,
     propertyType: row.interest_property_type,
@@ -218,7 +224,7 @@ export const interestMatchRequestRepository = {
        from interest_signals i
        left join interest_match_requests imr on imr.interest_signal_id = i.id and imr.status not in ('cancelled', 'owner_rejected', 'closed')
        where i.user_id = ?
-       group by i.id, i.user_id, i.title, i.country, i.area_city, i.property_type, i.market_segment, i.approval_status, i.public_status, i.verification_status, i.created_at, i.updated_at
+       group by i.id, i.user_id, i.title, i.reference_code, i.country, i.area_city, i.property_type, i.market_segment, i.approval_status, i.public_status, i.verification_status, i.created_at, i.updated_at
        order by i.updated_at desc
        limit 250`,
       [userId]

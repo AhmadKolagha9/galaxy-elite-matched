@@ -143,6 +143,7 @@ create table if not exists interest_signals (
   id char(36) primary key default (uuid()),
   user_id varchar(128) not null,
   title varchar(255) not null,
+  reference_code varchar(32) not null,
   user_role enum(
     'Buyer',
     'Investor',
@@ -270,6 +271,7 @@ create table if not exists interest_signals (
   constraint interest_signals_total_floors_nonnegative check (total_floors >= 0),
   constraint interest_signals_parking_spaces_nonnegative check (parking_spaces >= 0),
   constraint interest_signals_amenities_array check (json_type(amenities) = 'ARRAY'),
+  unique key interest_signals_reference_code_unique (reference_code),
   index interest_signals_user_idx (user_id),
   index interest_signals_status_idx (approval_status, public_status, verification_status),
   index interest_signals_match_idx (country, area_city, category, offering_type, property_type, market_segment)

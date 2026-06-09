@@ -12,7 +12,7 @@ type InterestMatchRequest = {
   ownerNote?: string | null
   adminNote?: string | null
   createdAt: string
-  interest: { title: string; country: string; areaCity: string; propertyType: string; marketSegment: string }
+  interest: { title: string; referenceCode: string; country: string; areaCity: string; propertyType: string; marketSegment: string }
   requester?: { email?: string | null; fullName?: string | null; verificationStatus?: string | null }
   owner?: { email?: string | null; fullName?: string | null }
 }
@@ -88,6 +88,7 @@ export function AdminInterestMatchRequests() {
           <article className="interest-manager-row" key={request.id}>
             <div>
               <strong>{request.interest.title}</strong>
+              <p><span className="reference-code-pill">Ref {request.interest.referenceCode}</span></p>
               <p>{request.interest.country} / {request.interest.areaCity} / {request.interest.propertyType}</p>
               <p>Requester: {request.requester?.email || request.requesterUserId || 'Member'} / Role: {request.requesterRole}</p>
               <p>Owner: {request.owner?.email || 'Owner account'} / Submitted: {formatDate(request.createdAt)}</p>

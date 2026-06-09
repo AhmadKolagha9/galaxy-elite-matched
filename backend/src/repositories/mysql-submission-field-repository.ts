@@ -19,6 +19,7 @@ type CreatedSubmission = {
   id: string;
   status: "pending_review";
   message: string;
+  referenceCode?: string;
 };
 
 const pendingMessage = "Submission received and pending Galaxy Elite review.";
@@ -86,7 +87,8 @@ const insertSubmission = async (
   return {
     id: String(values.id),
     status: "pending_review",
-    message: pendingMessage
+    message: pendingMessage,
+    referenceCode: typeof values.reference_code === "string" ? values.reference_code : undefined
   } satisfies CreatedSubmission;
 };
 
@@ -98,6 +100,8 @@ const hardcodedSecurityColumns = (userId: string) => ({
 });
 
 const serializeAmenities = (amenities: readonly string[]) => JSON.stringify(amenities);
+
+const interestReferenceCode = (id: string) => `IB-${id.replace(/-/g, "").slice(0, 12).toUpperCase()}`;
 
 const hasVerificationFilesAttached = (payload: PrivateAvailabilityPayload) => {
   const documents = payload.verification_documents ?? payload.uploadedDocuments ?? [];
@@ -152,11 +156,13 @@ export const createPrivateAvailability = async (input: { payload: PrivateAvailab
 export const createInterestSignal = async (input: { payload: InterestSignalPayload; userId: string }) =>
   withMySqlTransaction(async (connection) => {
     const payload = await normalizeLocationTaxonomy(input.payload, connection);
+    const id = randomUUID();
 
     return insertSubmission(
       "interest_signals",
       {
-        id: randomUUID(),
+        id,
+        reference_code: interestReferenceCode(id),
         ...hardcodedSecurityColumns(input.userId),
         title: payload.title,
         user_role: payload.user_role,

@@ -666,3 +666,19 @@ input[type="date"]::-webkit-calendar-picker-indicator { cursor: pointer; opacity
   .manager-actions { justify-content: flex-start; min-width: 0; }
   .segmented-tabs { display: grid; width: 100%; }
 }
+
+
+.reference-code-pill {
+  align-items: center;
+  background: rgba(35, 31, 32, 0.06);
+  border: 1px solid rgba(35, 31, 32, 0.12);
+  border-radius: 999px;
+  color: var(--muted);
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0;
+  margin: 6px 0;
+  padding: 6px 9px;
+  width: fit-content;
+}

@@ -126,6 +126,7 @@ export function InterestBoardClient({ cards }: InterestBoardClientProps) {
                 <StatusBadge status={card.status} />
               </div>
               <h3>{card.title}</h3>
+              <span className="reference-code-pill">Ref {card.referenceCode}</span>
               <dl>
                 <div><dt>Country</dt><dd>{card.country}</dd></div>
                 <div><dt>Area</dt><dd>{card.area}</dd></div>
@@ -155,6 +156,7 @@ export function InterestBoardClient({ cards }: InterestBoardClientProps) {
           <div className="interest-modal-panel">
             <div className="section-heading-inline"><h2>{activeCard.title}</h2><button className="button button-outline button-small" type="button" onClick={() => setActiveCard(null)}>Close</button></div>
             <dl className="interest-modal-details">
+              <div><dt>Reference</dt><dd>{activeCard.referenceCode}</dd></div>
               <div><dt>Status</dt><dd>{activeCard.status}</dd></div>
               <div><dt>Member</dt><dd>{activeCard.badge}</dd></div>
               <div><dt>Country</dt><dd>{activeCard.country}</dd></div>
@@ -175,7 +177,7 @@ export function InterestBoardClient({ cards }: InterestBoardClientProps) {
         <div className="modal-backdrop" role="dialog" aria-modal="true">
           <form className="interest-modal-panel" onSubmit={submitMatch}>
             <div className="section-heading-inline"><h2>Matched request</h2><button className="button button-outline button-small" type="button" onClick={() => setMatchCard(null)}>Close</button></div>
-            <p className="form-note">Send a request to the owner of this interest. The owner must approve before Galaxy Elite admin manually continues the process.</p>
+            <p className="form-note">Interest reference {matchCard.referenceCode}. Send a request to the owner of this interest. The owner must approve before Galaxy Elite admin manually continues the process.</p>
             <label>Request role<select value={requesterRole} onChange={(event) => setRequesterRole(event.target.value as (typeof requesterRoles)[number])}>{requesterRoles.map((role) => <option key={role}>{role}</option>)}</select></label>
             <label>Message<textarea rows={5} value={message} onChange={(event) => setMessage(event.target.value)} placeholder="Explain your matching position, authority, and what you can offer for this interest." required maxLength={2000} /></label>
             <div className="hero-actions">

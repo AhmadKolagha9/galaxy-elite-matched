@@ -8,7 +8,7 @@ Owner-approved Interest Board match requests enter the admin dashboard for manua
 - Access: compliance, admin, or super admin role through existing admin layout guards.
 
 ## Queue
-- Render requester, interest title, requester role, owner/admin statuses, submitted date, and message.
+- Render requester, interest title, interest reference code, requester role, owner/admin statuses, submitted date, and message.
 - Admin can set status to `in_progress`, `approved`, `rejected`, or `closed` with a note.
 - Backend writes every admin status mutation to `admin_actions`.
 

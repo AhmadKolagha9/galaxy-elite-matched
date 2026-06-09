@@ -4,11 +4,13 @@
 Merge public interest posting and interest discovery around the Interest Board while preserving server-side moderation, verification, owner consent, and admin-controlled match progression.
 
 ## Public Interest IDs
+- Every Interest Board post receives a server-generated `reference_code` when it is created. The client cannot submit or modify this code.
+- Reference codes use a short public-safe format such as `IB-1A2B3C4D5E6F` and are unique for communication between customers and Galaxy Elite staff.
 - Approved public-safe interest records may expose a non-sensitive `public_interest_id` so authenticated members can request a match against a specific approved demand signal.
 - Public responses must still redact user IDs, contact details, private descriptions containing contact data, documents, exact unit identifiers, and internal review fields.
 
 ## Member APIs
-- `GET /api/interest/me` lists the authenticated user's interest posts with current approval and public status.
+- `GET /api/interest/me` lists the authenticated user's interest posts with current approval status, public status, and `reference_code`.
 - `PATCH /api/interest/me/:id` supports owner actions:
   - `publish`: allowed only after admin approval, sets `public_status = open`.
   - `unpublish`: hides an approved post from the public board.

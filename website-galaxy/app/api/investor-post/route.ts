@@ -25,13 +25,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, errors: parsed.error.flatten() }, { status: 400 })
   }
 
-  const response = await fetch(`${getBackendApiUrl()}/api/investor-post`, {
+  const response = await fetch(`${getBackendApiUrl()}/api/private-opportunities`, {
     method: 'POST',
     headers: {
       'content-type': 'application/json',
       authorization
     },
-    body: JSON.stringify(parsed.data),
+    body: JSON.stringify({ opportunity_type: 'investor', ...parsed.data }),
     cache: 'no-store'
   })
 

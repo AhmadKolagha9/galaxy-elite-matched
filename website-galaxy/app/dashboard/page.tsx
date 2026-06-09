@@ -28,7 +28,7 @@ export default async function DashboardPage() {
       </div>
       <div className="dashboard-hero" style={{ marginTop: 22 }}>
         <h2>Next best actions</h2>
-        <div className="hero-actions"><Link className="button button-gold" href="/dashboard/post-interest">Post New Interest</Link><Link className="button button-outline" href="/dashboard/verified-listing">Verified Listing Request</Link><Link className="button button-outline" href="/dashboard/investor-post">Investor Post</Link>{isAdminUser(user) ? <Link className="button button-dark" href="/admin">Control Dashboard</Link> : null}</div>
+        <div className="hero-actions"><Link className="button button-gold" href="/dashboard/post-interest">Post New Interest</Link><Link className="button button-outline" href="/dashboard/verified-listing">Verified Listing Request</Link><Link className="button button-outline" href="/private-opportunities?mode=investor">Private Opportunities</Link>{isAdminUser(user) ? <Link className="button button-dark" href="/admin">Control Dashboard</Link> : null}</div>
       </div>
       <div className="pipeline">
         {matchStages.slice(0, 7).map((stage, index) => <div className="pipeline-step" key={stage}><span>{index + 1}</span><strong>{stage}</strong></div>)}

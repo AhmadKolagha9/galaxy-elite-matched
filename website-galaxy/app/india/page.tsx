@@ -20,7 +20,7 @@ export default function Page() {
         <div className="logo-strip"><span>India</span></div>
         <div className="hero-actions" style={{ justifyContent: 'center', marginTop: 28 }}>
           <Link className="button button-gold" href="/post-interest">Post Interest</Link>
-          <Link className="button button-outline" href="/private-availability">Submit Availability</Link>
+          <Link className="button button-outline" href="/private-opportunities?mode=availability">Submit Availability</Link>
         </div>
       </section>
     </>

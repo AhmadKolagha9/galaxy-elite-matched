@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { mainNav, site } from '@/lib/site'
 import { useMemberSession } from '@/lib/member-session-client'
 
-const protectedPaths = new Set(['/private-availability', '/investor-post'])
+const protectedPathPrefixes = ['/private-opportunities', '/private-availability', '/investor-post']
 
 
 function initials(name: string, email: string) {
@@ -22,7 +22,7 @@ function verificationLabel(status?: string) {
 }
 
 function authAwareHref(href: string, authenticated: boolean) {
-  if (authenticated || !protectedPaths.has(href)) return href
+  if (authenticated || !protectedPathPrefixes.some((path) => href.startsWith(path))) return href
   return `/login?next=${encodeURIComponent(href)}`
 }
 

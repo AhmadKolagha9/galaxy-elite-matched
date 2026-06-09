@@ -9,7 +9,7 @@ function text(value: unknown, fallback = '—') {
   return String(value)
 }
 
-const fieldMap = ['role', 'submitterRole', 'investorProfile', 'purpose', 'availabilityType', 'listingIntent', 'investorGoal', 'marketSegment', 'propertyType', 'country', 'cityArea', 'area', 'projectName', 'buildingName', 'size', 'budget', 'ticketSize', 'priceRange', 'targetYield', 'riskPreference', 'timeline', 'availabilityDate', 'budgetVisibility', 'agentPreference', 'authority', 'ownershipStatus', 'permitStatus', 'company', 'licenceNumber', 'representation']
+const fieldMap = ['role', 'submitterRole', 'investorProfile', 'investor_type', 'purpose', 'availabilityType', 'listingIntent', 'investorGoal', 'investment_goal', 'marketSegment', 'market_segments', 'propertyType', 'property_types', 'country', 'countries', 'cityArea', 'area_city', 'area', 'projectName', 'buildingName', 'size', 'budget', 'ticketSize', 'ticket_min', 'ticket_max', 'priceRange', 'targetYield', 'target_yield', 'riskPreference', 'risk_preference', 'timeline', 'holding_period', 'financing_method', 'availabilityDate', 'budgetVisibility', 'budget_visibility', 'agentPreference', 'authority', 'ownershipStatus', 'permitStatus', 'has_verification_files_attached', 'company', 'licenceNumber', 'representation']
 
 export function AdminSubmissionCard({ collection, record }: { collection: CollectionKey; record: SubmissionRecord }) {
   const title = text(record.title || record.projectName || record.propertyType || record.investorGoal || record.email, getCollectionLabel(collection))

@@ -38,6 +38,11 @@ type TaxonomyItem = {
 }
 
 const draftStorageKey = 'galaxy-private-availability-draft'
+type AvailabilityFormProps = {
+  submitEndpoint?: string
+  loginNext?: string
+  opportunityType?: 'availability'
+}
 
 async function fetchTaxonomy(type: string, countryScope?: string | null) {
   const params = new URLSearchParams({ type })
@@ -48,7 +53,7 @@ async function fetchTaxonomy(type: string, countryScope?: string | null) {
   return body.items ?? []
 }
 
-export function AvailabilityForm() {
+export function AvailabilityForm({ submitEndpoint = '/api/availability', loginNext = '/private-availability', opportunityType }: AvailabilityFormProps = {}) {
   const router = useRouter()
   const { user, loading: authLoading } = useMemberSession()
   const { status, message, isSubmitting, beginSubmit, finishSuccess, finishError, resetSubmit } = useSubmissionLock()
@@ -66,8 +71,8 @@ export function AvailabilityForm() {
   )
 
   useEffect(() => {
-    if (!authLoading && !user) router.replace(`/login?next=${encodeURIComponent('/private-availability')}`)
-  }, [authLoading, router, user])
+    if (!authLoading && !user) router.replace(`/login?next=${encodeURIComponent(loginNext)}`)
+  }, [authLoading, loginNext, router, user])
 
   useEffect(() => {
     let active = true
@@ -124,7 +129,7 @@ export function AvailabilityForm() {
     }
     if (!user) {
       finishError('Member login is required before submitting.')
-      router.push(`/login?next=${encodeURIComponent('/private-availability')}`)
+      router.push(`/login?next=${encodeURIComponent(loginNext)}`)
       return
     }
 
@@ -146,11 +151,12 @@ export function AvailabilityForm() {
     try {
       const verificationDocuments = ownershipFile ? [await uploadAvailabilityOwnershipDocument(ownershipFile)] : []
       const payload = {
+        ...(opportunityType ? { opportunity_type: opportunityType } : {}),
         ...parsed.data,
         verification_documents: verificationDocuments
       }
 
-      const response = await fetch('/api/availability', {
+      const response = await fetch(submitEndpoint, {
         method: 'POST',
         headers: {
           'content-type': 'application/json'

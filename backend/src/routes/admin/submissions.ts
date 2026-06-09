@@ -33,6 +33,20 @@ adminSubmissionsRouter.get(
   })
 );
 
+
+adminSubmissionsRouter.get(
+  "/private-opportunities",
+  requireAdminOrCompliance,
+  asyncHandler(async (request, response) => {
+    response.json({
+      ok: true,
+      records: await adminService.privateOpportunities({
+        approvalStatus: request.query.approvalStatus ? String(request.query.approvalStatus) : undefined
+      })
+    });
+  })
+);
+
 adminSubmissionsRouter.get(
   "/:id",
   requireAdminOrCompliance,

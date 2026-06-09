@@ -19,6 +19,7 @@ export async function adminDecisionAction(formData: FormData) {
   await updateSubmissionDecision({ collection, id, approvalStatus, publicStatus, verificationLevel, complianceNotes })
   revalidatePath('/admin')
   revalidatePath('/admin/approvals')
+  revalidatePath('/admin/private-opportunities')
   revalidatePath('/admin/compliance')
   revalidatePath('/interest-board')
 }

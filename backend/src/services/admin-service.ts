@@ -14,6 +14,15 @@ import {
   updateSubmissionStatus
 } from "../repositories/submission-repository.js";
 
+
+const listPrivateOpportunitySubmissions = async (filters: { approvalStatus?: string }) => {
+  const [availability, investor] = await Promise.all([
+    listAdminSubmissions({ type: "availability", approvalStatus: filters.approvalStatus }),
+    listAdminSubmissions({ type: "investor", approvalStatus: filters.approvalStatus })
+  ]);
+  return [...availability, ...investor].sort((a, b) => String(b.submittedAt).localeCompare(String(a.submittedAt)));
+};
+
 const actionPatch: Record<string, Partial<{ approvalStatus: ApprovalStatus; publicStatus: PublicStatus; verificationStatus: VerificationStatus }>> = {
   approve: { approvalStatus: "approved" },
   reject: { approvalStatus: "rejected", publicStatus: "hidden" },
@@ -28,6 +37,7 @@ export const adminService = {
   summary: getAdminSummary,
   collections: listAdminCollections,
   list: listAdminSubmissions,
+  privateOpportunities: listPrivateOpportunitySubmissions,
   detail: findSubmissionById,
   decide: async (input: {
     actor: AuthPrincipal;

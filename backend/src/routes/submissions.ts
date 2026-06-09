@@ -59,7 +59,100 @@ const createSubmissionHandler = (typeName: string) =>
     response.status(type === "newsletter" ? 200 : 201).json(result);
   });
 
+const privateOpportunityTypeSchema = z.enum(["availability", "investor"]);
+
+const asText = (value: unknown) => {
+  if (typeof value !== "string") return undefined;
+  const trimmed = value.trim();
+  return trimmed.length ? trimmed : undefined;
+};
+
+const toTextArray = (value: unknown) => {
+  if (Array.isArray(value)) return value.map(asText).filter((item): item is string => Boolean(item));
+  const text = asText(value);
+  return text ? [text] : [];
+};
+
+const yes = (value: unknown) => value === true || value === "true" || value === "on" || value === 1 || value === "1";
+
+const rangeLabel = (minimum: unknown, maximum: unknown) => {
+  const min = asText(String(minimum ?? ""));
+  const max = asText(String(maximum ?? ""));
+  if (min && max) return `${min} - ${max}`;
+  return min ?? max;
+};
+
+const respondentPreference = (data: Record<string, unknown>) => {
+  const options = [];
+  if (yes(data.accepts_direct_owner)) options.push("Direct owners");
+  if (yes(data.accepts_developer)) options.push("Developers");
+  if (yes(data.accepts_agent)) options.push("Licensed agents");
+  return options.length ? options.join(", ") : "Verified responders only";
+};
+
+const firstOf = (values: string[]) => values[0];
+
+const normalizeInvestorOpportunityPayload = (data: Record<string, unknown>, user: AuthPrincipal | undefined) => {
+  const countries = toTextArray(data.countries ?? data.country);
+  const propertyTypes = toTextArray(data.property_types ?? data.propertyTypes ?? data.propertyType);
+  const marketSegments = toTextArray(data.market_segments ?? data.marketSegments ?? data.marketSegment);
+  const email = asText(data.email) ?? asText(user?.email);
+  if (!email) throw badRequest("Authenticated email is required for investor opportunities.");
+
+  return {
+    ...data,
+    name: asText(data.name) ?? user?.profile?.fullName ?? email,
+    email,
+    phone: asText(data.phone) ?? user?.profile?.phone ?? "Not provided",
+    investorProfile: asText(data.investor_type) ?? asText(data.investorProfile),
+    investorGoal: asText(data.investment_goal) ?? asText(data.investorGoal),
+    marketSegment: firstOf(marketSegments) ?? asText(data.marketSegment),
+    marketSegments,
+    country: firstOf(countries) ?? asText(data.country),
+    countries,
+    cityArea: asText(data.area_city) ?? asText(data.cityArea),
+    propertyType: firstOf(propertyTypes) ?? asText(data.propertyType),
+    propertyTypes,
+    ticketSize: rangeLabel(data.ticket_min, data.ticket_max) ?? asText(data.ticketSize),
+    budgetVisibility: asText(data.budget_visibility) ?? asText(data.budgetVisibility),
+    targetYield: asText(data.target_yield) ?? asText(data.targetYield),
+    riskPreference: asText(data.risk_preference) ?? asText(data.riskPreference),
+    description: asText(data.private_description) ?? asText(data.description),
+    agentPreference: asText(data.agentPreference) ?? respondentPreference(data)
+  };
+};
+
 submissionsRouter.use(optionalAuth);
+
+submissionsRouter.post(
+  "/private-opportunities",
+  publicSubmissionRateLimit,
+  requireAuth,
+  asyncHandler(async (request, response) => {
+    const body = requireObjectBody(request.body);
+    const opportunityType = parsePayload(privateOpportunityTypeSchema, body.opportunity_type ?? body.opportunityType);
+
+    if (opportunityType === "availability") {
+      const payload = parsePayload(privateAvailabilitySchema, body);
+      const result = await createPrivateAvailability({ payload, userId: requestUserId(request.user) });
+      response.status(201).json({ ok: true, ...result });
+      return;
+    }
+
+    const type = parseSubmissionType("investor");
+    const normalized = normalizeInvestorOpportunityPayload(body, request.user);
+    const data = sanitizeSubmissionPayload(type, normalized);
+    validateSubmission(type, data);
+    await validateSubmissionTaxonomy(type, data);
+    const result = await submissionService.create({
+      type,
+      data,
+      uploadedDocuments: Array.isArray(data.uploadedDocuments) ? (data.uploadedDocuments as never) : undefined,
+      userId: request.user?.isServiceAccount ? undefined : request.user?.id
+    });
+    response.status(201).json(result);
+  })
+);
 
 submissionsRouter.post(
   "/interest",
@@ -127,7 +220,25 @@ submissionsRouter.get(
   })
 );
 
-submissionsRouter.post("/investor-post", publicSubmissionRateLimit, createSubmissionHandler("investor"));
+submissionsRouter.post(
+  "/investor-post",
+  publicSubmissionRateLimit,
+  requireAuth,
+  asyncHandler(async (request, response) => {
+    const type = parseSubmissionType("investor");
+    const normalized = normalizeInvestorOpportunityPayload(requireObjectBody(request.body), request.user);
+    const data = sanitizeSubmissionPayload(type, normalized);
+    validateSubmission(type, data);
+    await validateSubmissionTaxonomy(type, data);
+    const result = await submissionService.create({
+      type,
+      data,
+      uploadedDocuments: Array.isArray(data.uploadedDocuments) ? (data.uploadedDocuments as never) : undefined,
+      userId: request.user?.isServiceAccount ? undefined : request.user?.id
+    });
+    response.status(201).json(result);
+  })
+);
 submissionsRouter.get(
   "/investor-post",
   asyncHandler(async (_request, response) => {

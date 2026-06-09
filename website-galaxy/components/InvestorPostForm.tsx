@@ -26,9 +26,14 @@ import {
 import { useInvestorTaxonomy } from '@/lib/use-investor-taxonomy'
 
 type SubmitStatus = 'idle' | 'loading' | 'success' | 'error'
+type InvestorPostFormProps = {
+  submitEndpoint?: string
+  loginNext?: string
+  opportunityType?: 'investor'
+}
 const draftStorageKey = 'galaxy-investor-post-draft'
 
-export function InvestorPostForm() {
+export function InvestorPostForm({ submitEndpoint = '/api/investor-post', loginNext = '/investor-post', opportunityType }: InvestorPostFormProps = {}) {
   const router = useRouter()
   const { user, loading: authLoading } = useMemberSession()
   const { countries, selectedCountries, toggleCountry, filteredAreas } = useInvestorTaxonomy()
@@ -36,8 +41,8 @@ export function InvestorPostForm() {
   const [message, setMessage] = useState('')
 
   useEffect(() => {
-    if (!authLoading && !user) router.replace(`/login?next=${encodeURIComponent('/investor-post')}`)
-  }, [authLoading, router, user])
+    if (!authLoading && !user) router.replace(`/login?next=${encodeURIComponent(loginNext)}`)
+  }, [authLoading, loginNext, router, user])
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -45,7 +50,7 @@ export function InvestorPostForm() {
 
     if (authLoading) return
     if (!user) {
-      router.push(`/login?next=${encodeURIComponent('/investor-post')}`)
+      router.push(`/login?next=${encodeURIComponent(loginNext)}`)
       return
     }
 
@@ -62,12 +67,12 @@ export function InvestorPostForm() {
     setStatus('loading')
 
     try {
-      const response = await fetch('/api/investor-post', {
+      const response = await fetch(submitEndpoint, {
         method: 'POST',
         headers: {
           'content-type': 'application/json'
         },
-        body: JSON.stringify(parsed.data)
+        body: JSON.stringify({ ...(opportunityType ? { opportunity_type: opportunityType } : {}), ...parsed.data })
       })
       const result = await response.json().catch(() => null) as { ok?: boolean; message?: string; error?: string } | null
 

@@ -9,10 +9,11 @@ import type { AuthPrincipal } from "../domain/submissions.js";
 import { createInterestSignal, createPrivateAvailability } from "../repositories/mysql-submission-field-repository.js";
 import { listPublicRecords } from "../repositories/submission-repository.js";
 import { submissionService } from "../services/submission-service.js";
+import { interestMatchRequestService } from "../services/interest-match-request-service.js";
 import { interestSignalSchema, privateAvailabilitySchema } from "../schemas/submission-fields.js";
 import { validateSubmissionTaxonomy } from "../utils/submission-taxonomy-validation.js";
 import { sanitizeSubmissionPayload } from "../utils/submission-payload.js";
-import { sanitizePublicRecords } from "../utils/output-sanitizer.js";
+import { sanitizeOutput, sanitizePublicRecords } from "../utils/output-sanitizer.js";
 import { parseSubmissionType, requireObjectBody, validateSubmission } from "../utils/validation.js";
 
 export const submissionsRouter = Router();
@@ -74,7 +75,31 @@ submissionsRouter.post(
 submissionsRouter.get(
   "/interest",
   asyncHandler(async (_request, response) => {
-    response.json({ ok: true, records: sanitizePublicRecords(await listPublicRecords("interest")) });
+    const records = await listPublicRecords("interest");
+    response.json({
+      ok: true,
+      records: records.map((record) => ({
+        ...(sanitizeOutput(record) as Record<string, unknown>),
+        public_interest_id: record.id
+      }))
+    });
+  })
+);
+
+submissionsRouter.get(
+  "/interest/me",
+  requireAuth,
+  asyncHandler(async (request, response) => {
+    response.json(await interestMatchRequestService.listMyPosts(request.user!));
+  })
+);
+
+submissionsRouter.patch(
+  "/interest/me/:id",
+  requireAuth,
+  asyncHandler(async (request, response) => {
+    const body = requireObjectBody(request.body);
+    response.json(await interestMatchRequestService.updateMyPostStatus(request.user!, request.params.id, body.action));
   })
 );
 

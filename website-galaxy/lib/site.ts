@@ -15,7 +15,6 @@ export const site = {
 }
 
 export const mainNav = [
-  { href: '/post-interest', label: 'Post Interest' },
   { href: '/interest-board', label: 'Interest Board' },
   { href: '/private-availability', label: 'Private Availability' },
   { href: '/verified-listing', label: 'Verified Listing' },
@@ -26,7 +25,7 @@ export const mainNav = [
 
 export const dashboardNav = [
   { href: '/dashboard', label: 'Overview' },
-  { href: '/dashboard/post-interest', label: 'New Interest' },
+  { href: '/interest-board?add=1', label: 'Add Interest' },
   { href: '/dashboard/verified-listing', label: 'Verified Listing Request' },
   { href: '/dashboard/investor-post', label: 'Investor Post' },
   { href: '/dashboard/matches', label: 'Matches' },

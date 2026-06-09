@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { requireUser } from '@/lib/auth'
 import { getBackendJwtPayloadFromCookie, getVerificationState } from '@/lib/native-session'
 import { ProfileDetailsForm } from '@/components/ProfileDetailsForm'
+import { InterestBoardManager } from '@/components/InterestBoardManager'
 import { pageMetadata } from '@/lib/seo'
 
 export const metadata: Metadata = pageMetadata({ title: 'Profile', description: 'Private Match profile.', path: '/dashboard/profile', noindex: true })
@@ -35,6 +36,7 @@ export default async function DashboardProfilePage() {
         <p>Update the member name and email used for private match communication.</p>
         <ProfileDetailsForm initialName={user.name} initialEmail={user.email} />
       </section>
+      <InterestBoardManager />
       <div className="policy-grid">
         <article className="policy-card"><h3>Role</h3><p>{user.role}</p></article>
         <article className="policy-card"><h3>Verification</h3><p>{verificationCopy(verificationStatus)}</p></article>

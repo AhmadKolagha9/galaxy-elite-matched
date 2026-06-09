@@ -16,6 +16,7 @@ export default async function CompliancePage() {
       <div className="admin-quick-actions">
         <Link className="button button-outline" href="/admin/compliance/agents">Open Agent Review</Link>
         <Link className="button button-outline" href="/admin/compliance/identities">Open Identity Review</Link>
+        <Link className="button button-outline" href="/admin/compliance/interest-matches">Interest Matches</Link>
       </div>
       <section className="admin-section">
         <div className="section-heading-inline"><h2>Required document checklist</h2><span>{verificationDocumentTypes.length} checks</span></div>

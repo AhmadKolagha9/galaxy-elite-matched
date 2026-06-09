@@ -25,6 +25,7 @@ export default async function AdminPage() {
         <Link className="button button-gold" href="/admin/approvals">Open Approval Queue</Link>
         <Link className="button button-outline" href="/admin/compliance">Compliance Vault</Link>
         <Link className="button button-outline" href="/admin/compliance/agents">Agent Review</Link>
+        <Link className="button button-outline" href="/admin/compliance/interest-matches">Interest Matches</Link>
         <Link className="button button-outline" href="/admin/taxonomy">Manage Dropdown Logic</Link>
       </div>
       <div className="admin-collection-grid">

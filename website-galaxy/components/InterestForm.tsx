@@ -50,6 +50,7 @@ export function InterestForm({ compact = false }: { compact?: boolean }) {
   const [countries, setCountries] = useState<TaxonomyItem[]>(fallbackCountries)
   const [areas, setAreas] = useState<TaxonomyItem[]>(fallbackAreas)
   const [country, setCountry] = useState(fallbackCountries[0]?.slug ?? 'uae')
+  const [selectedAmenities, setSelectedAmenities] = useState<string[]>([])
 
   const locked = isSubmitting || authLoading
   const countryScope = useMemo(() => countryScopeFromValue(country, countries), [country, countries])
@@ -84,6 +85,14 @@ export function InterestForm({ compact = false }: { compact?: boolean }) {
       active = false
     }
   }, [countryScope])
+
+  function toggleAmenity(item: string) {
+    setSelectedAmenities((current) => current.includes(item) ? current.filter((value) => value !== item) : [...current, item])
+  }
+
+  function removeAmenity(item: string) {
+    setSelectedAmenities((current) => current.filter((value) => value !== item))
+  }
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -130,6 +139,7 @@ export function InterestForm({ compact = false }: { compact?: boolean }) {
 
       finishSuccess(result.message || 'Submission received and pending Galaxy Elite review.')
       form.reset()
+      setSelectedAmenities([])
       setCountry(countries[0]?.slug ?? countries[0]?.label ?? 'uae')
     } catch (error) {
       finishError(error instanceof Error ? error.message : 'Interest submission failed.')
@@ -157,7 +167,7 @@ export function InterestForm({ compact = false }: { compact?: boolean }) {
           <label>Size target, sqft<input name="size_sqft" type="number" min="0" step="0.01" required /></label>
           <label>Budget min<input name="price_min" type="number" min="0" step="0.01" required /></label>
           <label>Budget max<input name="price_max" type="number" min="0" step="0.01" required /></label>
-          <label>Activation date<input name="availability_date" type="date" required /></label>
+          <label>Activation date<input name="availability_date" type="date" required onFocus={(event) => event.currentTarget.showPicker?.()} onClick={(event) => event.currentTarget.showPicker?.()} /></label>
           <label>Privacy level<select name="privacy_level" required>{privacyLevelOptions.map((item) => <option key={item}>{item}</option>)}</select></label>
           <label>Preferred Payment Method<select name="preferred_payment_method" required>{preferredPaymentMethodOptions.map((item) => <option key={item}>{item}</option>)}</select></label>
           <label>Category<select name="category" required>{categoryOptions.map((item) => <option key={item}>{item}</option>)}</select></label>
@@ -169,13 +179,26 @@ export function InterestForm({ compact = false }: { compact?: boolean }) {
           <label>Furnishing<select name="furnishing_type" required>{furnishingTypeOptions.map((item) => <option key={item}>{item}</option>)}</select></label>
           <label>Project status<select name="project_status" required>{projectStatusOptions.map((item) => <option key={item}>{item}</option>)}</select></label>
         </div>
-        <fieldset className="form-fieldset">
+        <fieldset className="form-fieldset amenities-multiselect">
           <legend>Amenities</legend>
-          <div className="checkbox-grid">
-            {amenitiesOptions.map((item) => (
-              <label className="checkbox" key={item}><input type="checkbox" name="amenities" value={item} /> {item}</label>
-            ))}
-          </div>
+          {selectedAmenities.map((item) => <input key={item} type="hidden" name="amenities" value={item} />)}
+          <details className="multi-select-dropdown">
+            <summary>{selectedAmenities.length ? `${selectedAmenities.length} selected` : 'Select amenities'}</summary>
+            <div className="multi-select-panel">
+              {amenitiesOptions.map((item) => (
+                <button className={selectedAmenities.includes(item) ? 'multi-select-option is-selected' : 'multi-select-option'} type="button" key={item} onClick={() => toggleAmenity(item)}>
+                  <span>{item}</span><strong>{selectedAmenities.includes(item) ? 'Selected' : 'Add'}</strong>
+                </button>
+              ))}
+            </div>
+          </details>
+          {selectedAmenities.length ? (
+            <div className="chip-list" aria-label="Selected amenities">
+              {selectedAmenities.map((item) => (
+                <button key={item} className="chip-item" type="button" onClick={() => removeAmenity(item)}>{item}<span aria-hidden="true">x</span></button>
+              ))}
+            </div>
+          ) : <p className="form-note">Select at least one amenity.</p>}
         </fieldset>
         <label>Private description<textarea name="private_description" rows={5} placeholder="Describe the requirement, budget sensitivity, location preference, and timing." required /></label>
         <label className="checkbox"><input type="checkbox" name="consent" required /> I agree that Galaxy Elite may process this interest for verified private matching.</label>

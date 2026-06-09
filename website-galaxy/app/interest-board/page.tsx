@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { InterestCard } from '@/components/InterestCard'
+import { InterestBoardClient } from '@/components/InterestBoardClient'
 import { PageHero } from '@/components/PageHero'
 import { fallbackCountries, marketSegmentOptions, propertyTypeOptions } from '@/lib/interest-submission'
 import { getPublicInterestCards, type PublicInterestBoardSearchParams } from '@/lib/public-interest-board'
@@ -54,16 +54,7 @@ export default async function InterestBoardPage({ searchParams }: InterestBoardP
         <div className="hero-proof" style={{ justifyContent: 'center', marginBottom: 28 }}>
           <span>Open</span><span>Matching</span><span>Matched</span><span>Admin approved only</span><span>Public-safe summaries</span>
         </div>
-        {cards.length ? (
-          <div className="interest-grid">
-            {cards.map((card) => <InterestCard key={card.id} card={card} />)}
-          </div>
-        ) : (
-          <div className="empty-state">
-            <h2>No approved public interests match these filters.</h2>
-            <p>Demand records remain hidden until Galaxy Elite approves them for public board visibility.</p>
-          </div>
-        )}
+        <InterestBoardClient cards={cards} />
       </section>
     </>
   )

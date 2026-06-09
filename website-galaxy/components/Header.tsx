@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { mainNav, site } from '@/lib/site'
 import { useMemberSession } from '@/lib/member-session-client'
 
-const protectedPaths = new Set(['/post-interest', '/private-availability', '/investor-post'])
+const protectedPaths = new Set(['/private-availability', '/investor-post'])
 
 
 function initials(name: string, email: string) {

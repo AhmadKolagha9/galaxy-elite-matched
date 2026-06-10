@@ -26,11 +26,18 @@ type VerifiedListingFormProps = {
   compact?: boolean
 }
 
+const directSubmitterRoles = new Set(['Direct owner', 'Direct landlord'])
+const planDocumentPropertyTypes = new Set(['Off-plan unit', 'Villa'])
+
 export function VerifiedListingForm({ compact = false }: VerifiedListingFormProps) {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [message, setMessage] = useState('')
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([])
+  const [submitterRole, setSubmitterRole] = useState('Direct owner')
+  const [propertyType, setPropertyType] = useState(propertyTypeOptions[0] || '')
   const locked = status === 'loading'
+  const showAuthorityDocument = !directSubmitterRoles.has(submitterRole)
+  const showPlanDocuments = planDocumentPropertyTypes.has(propertyType)
 
   function toggleAmenity(item: string) {
     setSelectedAmenities((current) => current.includes(item) ? current.filter((value) => value !== item) : [...current, item])
@@ -57,6 +64,8 @@ export function VerifiedListingForm({ compact = false }: VerifiedListingFormProp
     setMessage(body.message || 'Private Club property post submitted for strict compliance review.')
     form.reset()
     setSelectedAmenities([])
+    setSubmitterRole('Direct owner')
+    setPropertyType(propertyTypeOptions[0] || '')
   }
 
   return (
@@ -71,12 +80,12 @@ export function VerifiedListingForm({ compact = false }: VerifiedListingFormProp
         </div>
       <div className="form-grid">
         <label>Title<input name="title" required maxLength={255} placeholder="Example: Private Club villa availability in Dubai" /></label>
-        <label>Submitter role<select name="submitterRole" required><option>Direct owner</option><option>Direct landlord</option><option>Developer</option><option>Licensed agent with authority</option><option>Property manager with authority</option><option>Representative with written mandate</option></select></label>
+        <label>Submitter role<select name="submitterRole" required value={submitterRole} onChange={(event) => setSubmitterRole(event.target.value)}><option>Direct owner</option><option>Direct landlord</option><option>Developer</option><option>Licensed agent with authority</option><option>Property manager with authority</option><option>Representative with written mandate</option></select></label>
         <label>Availability type<select name="availabilityType" required>{availabilityTypeOptions.map((item) => <option key={item}>{item}</option>)}</select></label>
         <label>Listing intent<select name="listingIntent" required>{listingIntentOptions.map((item) => <option key={item}>{item}</option>)}</select></label>
         <label>Requirement type<select name="purpose" required>{purposeOptions.map((item) => <option key={item}>{item}</option>)}</select></label>
         <label>Market segment<select name="marketSegment" required>{marketSegmentOptions.map((item) => <option key={item}>{item}</option>)}</select></label>
-        <label>Property type<select name="propertyType" required>{propertyTypeOptions.map((type) => <option key={type}>{type}</option>)}</select></label>
+        <label>Property type<select name="propertyType" required value={propertyType} onChange={(event) => setPropertyType(event.target.value)}>{propertyTypeOptions.map((type) => <option key={type}>{type}</option>)}</select></label>
         <label>Country<select name="country" required>{countryOptions.map((country) => <option key={country}>{country}</option>)}</select></label>
         <label>Area / city<select name="cityArea" required>{areaCityOptions.map((area) => <option key={area}>{area}</option>)}</select></label>
         <label>Project / community<input name="projectName" placeholder="Project, community, development or master plan" /></label>
@@ -134,11 +143,9 @@ export function VerifiedListingForm({ compact = false }: VerifiedListingFormProp
         <p>Documents remain private and are visible only to Galaxy Elite compliance/admin review.</p>
         <div className="form-grid">
           <label>Title deed / ownership proof<input name="titleDeed" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp" /></label>
-          <label>Owner ID / passport / Emirates ID<input name="ownerId" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp" /></label>
-          <label>Authority letter / POA<input name="authorityDocument" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp" /></label>
-          <label>Broker / company licence<input name="brokerLicence" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp" /></label>
+          {showAuthorityDocument ? <label>Authority letter / POA<input name="authorityDocument" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp" /></label> : null}
           <label>Permit / RERA / Madmoun / project approval<input name="permitDocument" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp" /></label>
-          <label>Floor plan / photos / supporting docs<input name="supportingDocuments" type="file" multiple accept=".pdf,.jpg,.jpeg,.png,.webp" /></label>
+          {showPlanDocuments ? <label>Floor plan / photos / supporting docs<input name="supportingDocuments" type="file" multiple accept=".pdf,.jpg,.jpeg,.png,.webp" /></label> : null}
         </div>
       </div>
       <label className="checkbox"><input type="checkbox" name="strictVerification" required /> I understand this Private Club post cannot be shown until Galaxy Elite approves documents and compliance status.</label>

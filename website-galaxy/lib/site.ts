@@ -17,9 +17,9 @@ export const site = {
 export const mainNav = [
   { href: '/private-club', label: 'Private Club' },
   { href: '/interest-board', label: 'Interest Board' },
-  { href: '/submit', label: 'Submit' },
   { href: '/private-opportunities', label: 'Private Opportunities' },
-  { href: '/market-pulse', label: 'Market Pulse' }
+  { href: '/market-pulse', label: 'Market Pulse' },
+  { href: '/submit', label: 'Submit' }
 ]
 
 export const dashboardNav = [

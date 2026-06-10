@@ -10,6 +10,7 @@ import { areaCityOptions, countryOptions, marketSegmentOptions, propertyTypeOpti
 import { preferredPaymentMethodOptions } from '@/lib/availability-submission'
 
 const requesterRoles = ['an agent', 'Buyer', 'tenant', 'other'] as const
+const initialFilters = { bedrooms: '', dateFrom: '', dateTo: '', purpose: '', country: '', city: '', propertyType: '', marketSegment: '', paymentMethod: '', q: '' }
 
 type RequestState = 'idle' | 'sending' | 'sent' | 'error'
 
@@ -42,10 +43,12 @@ export function PrivateClubClient({ posts }: { posts: PrivateClubPostCard[] }) {
   const [message, setMessage] = useState('')
   const [requestState, setRequestState] = useState<RequestState>('idle')
   const [requestMessage, setRequestMessage] = useState('')
-  const [filters, setFilters] = useState({ bedrooms: '', dateFrom: '', dateTo: '', purpose: '', country: '', city: '', propertyType: '', marketSegment: '', paymentMethod: '', q: '' })
+  const [filters, setFilters] = useState(initialFilters)
 
   const authenticated = Boolean(user)
   const verified = isVerified(user?.verificationStatus)
+
+  const activeFilterCount = Object.values(filters).filter(Boolean).length
 
   const filteredPosts = useMemo(() => posts.filter((post) => {
     const postDate = dateValue(post.availabilityDate)
@@ -68,6 +71,10 @@ export function PrivateClubClient({ posts }: { posts: PrivateClubPostCard[] }) {
 
   function setFilter(name: keyof typeof filters, value: string) {
     setFilters((current) => ({ ...current, [name]: value }))
+  }
+
+  function clearFilters() {
+    setFilters(initialFilters)
   }
 
   function openAdd() {
@@ -146,16 +153,30 @@ export function PrivateClubClient({ posts }: { posts: PrivateClubPostCard[] }) {
       {showForm ? <div id="add-private-club" className="interest-board-form-panel"><VerifiedListingForm compact /></div> : null}
 
       <section className="private-club-filters" aria-label="Private Club filters">
-        <label>Search<input value={filters.q} onChange={(event) => setFilter('q', event.target.value)} placeholder="Reference, title, area..." /></label>
-        <label>Bedrooms<input value={filters.bedrooms} onChange={(event) => setFilter('bedrooms', event.target.value)} type="number" min="0" /></label>
-        <label>Date from<input value={filters.dateFrom} onChange={(event) => setFilter('dateFrom', event.target.value)} type="date" /></label>
-        <label>Date to<input value={filters.dateTo} onChange={(event) => setFilter('dateTo', event.target.value)} type="date" /></label>
-        <label>Required type<select value={filters.purpose} onChange={(event) => setFilter('purpose', event.target.value)}><option value="">All</option>{purposeOptions.map((item) => <option key={item}>{item}</option>)}</select></label>
-        <label>Country<select value={filters.country} onChange={(event) => setFilter('country', event.target.value)}><option value="">All</option>{countryOptions.map((item) => <option key={item}>{item}</option>)}</select></label>
-        <label>City<select value={filters.city} onChange={(event) => setFilter('city', event.target.value)}><option value="">All</option>{areaCityOptions.map((item) => <option key={item}>{item}</option>)}</select></label>
-        <label>Property type<select value={filters.propertyType} onChange={(event) => setFilter('propertyType', event.target.value)}><option value="">All</option>{propertyTypeOptions.map((item) => <option key={item}>{item}</option>)}</select></label>
-        <label>Market<select value={filters.marketSegment} onChange={(event) => setFilter('marketSegment', event.target.value)}><option value="">All</option>{marketSegmentOptions.map((item) => <option key={item}>{item}</option>)}</select></label>
-        <label>Payment<select value={filters.paymentMethod} onChange={(event) => setFilter('paymentMethod', event.target.value)}><option value="">All</option>{preferredPaymentMethodOptions.map((item) => <option key={item}>{item}</option>)}</select></label>
+        <div className="private-club-filter-head">
+          <div>
+            <strong>Find a match</strong>
+            <span>{filteredPosts.length} of {posts.length} posts{activeFilterCount ? ` · ${activeFilterCount} active` : ''}</span>
+          </div>
+          <button className="button button-outline button-small" type="button" onClick={clearFilters} disabled={!activeFilterCount}>Clear</button>
+        </div>
+        <div className="private-club-filter-row">
+          <label className="private-club-filter-search"><span>Search</span><input value={filters.q} onChange={(event) => setFilter('q', event.target.value)} placeholder="Reference, title, area..." /></label>
+          <label><span>Property type</span><select value={filters.propertyType} onChange={(event) => setFilter('propertyType', event.target.value)}><option value="">All</option>{propertyTypeOptions.map((item) => <option key={item}>{item}</option>)}</select></label>
+          <label><span>Country</span><select value={filters.country} onChange={(event) => setFilter('country', event.target.value)}><option value="">All</option>{countryOptions.map((item) => <option key={item}>{item}</option>)}</select></label>
+          <label><span>Bedrooms</span><input value={filters.bedrooms} onChange={(event) => setFilter('bedrooms', event.target.value)} type="number" min="0" /></label>
+        </div>
+        <details className="private-club-filter-more">
+          <summary>More filters</summary>
+          <div className="private-club-filter-panel">
+            <label><span>Date from</span><input value={filters.dateFrom} onChange={(event) => setFilter('dateFrom', event.target.value)} type="date" /></label>
+            <label><span>Date to</span><input value={filters.dateTo} onChange={(event) => setFilter('dateTo', event.target.value)} type="date" /></label>
+            <label><span>Required type</span><select value={filters.purpose} onChange={(event) => setFilter('purpose', event.target.value)}><option value="">All</option>{purposeOptions.map((item) => <option key={item}>{item}</option>)}</select></label>
+            <label><span>City</span><select value={filters.city} onChange={(event) => setFilter('city', event.target.value)}><option value="">All</option>{areaCityOptions.map((item) => <option key={item}>{item}</option>)}</select></label>
+            <label><span>Market</span><select value={filters.marketSegment} onChange={(event) => setFilter('marketSegment', event.target.value)}><option value="">All</option>{marketSegmentOptions.map((item) => <option key={item}>{item}</option>)}</select></label>
+            <label><span>Payment</span><select value={filters.paymentMethod} onChange={(event) => setFilter('paymentMethod', event.target.value)}><option value="">All</option>{preferredPaymentMethodOptions.map((item) => <option key={item}>{item}</option>)}</select></label>
+          </div>
+        </details>
       </section>
 
       {filteredPosts.length ? (

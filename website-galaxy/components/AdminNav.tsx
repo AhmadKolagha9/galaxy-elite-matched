@@ -8,6 +8,7 @@ const adminLinks = [
   { href: '/admin/compliance/identities', label: 'Identity Review' },
   { href: '/admin/compliance/agents', label: 'Agent Review' },
   { href: '/admin/taxonomy', label: 'Dropdowns / Taxonomy' },
+  { href: '/admin/site-settings', label: 'Site Settings' },
   { href: '/dashboard', label: 'Member Dashboard' }
 ]
 

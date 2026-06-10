@@ -1,39 +1,32 @@
 import Link from 'next/link'
-import { markets, site } from '@/lib/site'
+import { mainNav, site } from '@/lib/site'
+import { filterNavigationWithSettings, getSiteSettings } from '@/lib/site-settings'
 
-export function Footer() {
+export async function Footer() {
+  const settings = await getSiteSettings()
+  const platformLinks = filterNavigationWithSettings(settings, mainNav).filter((item) => item.href !== '/market-pulse')
   return (
-    <footer className="site-footer">
-      <div className="footer-grid">
-        <div>
+    <footer className="site-footer old-site-footer">
+      <div className="footer-compact">
+        <div className="footer-statement">
           <img
-            className="footer-logo"
-            src="/brand/galaxy-elite-private-match-horizontal-transparent.png"
-            alt="Galaxy Elite Private Match"
-            width="1800"
-            height="520"
+            className="footer-mark"
+            src="/brand/galaxy-elite-icon-only-gold-transparent.png"
+            alt=""
+            width="512"
+            height="512"
           />
-          <p>{site.description}</p>
-          <p className="footer-promise">{site.promise}</p>
+          <div>
+            <strong>{site.product}</strong>
+            <p>No public private-property uploads. No hidden agents. No direct contact before approval.</p>
+          </div>
         </div>
-        <div>
-          <h3>Platform</h3>
-          <Link href="/submit">Submit</Link>
-          <Link href="/interest-board">Interest Board</Link>
-          <Link href="/private-opportunities">Private Opportunities</Link>
-          <Link href="/private-club">Private Club</Link>
-        </div>
-        <div>
-          <h3>Markets</h3>
-          {markets.map((market) => <Link key={market.href} href={market.href}>{market.label}</Link>)}
-        </div>
-        <div>
-          <h3>Trust</h3>
-          <Link href="/for-agents">Agent Disclosure</Link>
+        <nav className="footer-short-nav" aria-label="Footer navigation">
+          {platformLinks.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}
+          <Link href="/for-agents">Agents</Link>
           <Link href="/privacy">Privacy</Link>
           <Link href="/terms">Terms</Link>
-          <a href={`https://wa.me/${site.whatsapp}`}>WhatsApp</a>
-        </div>
+        </nav>
       </div>
       <div className="footer-bottom">
         <span>© {new Date().getFullYear()} {site.company}. Built for private property matching.</span>

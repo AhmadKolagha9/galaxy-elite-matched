@@ -6,11 +6,13 @@ import { getSupabaseKey, isSupabaseConfigured } from '@/lib/env'
 const protectedPrefixes = ['/dashboard', '/admin']
 
 export async function proxy(request: NextRequest) {
+  const requestHeaders = new Headers(request.headers)
+  requestHeaders.set('x-galaxy-pathname', request.nextUrl.pathname)
   const isProtected = protectedPrefixes.some((prefix) => request.nextUrl.pathname.startsWith(prefix))
-  if (!isProtected) return NextResponse.next()
+  if (!isProtected) return NextResponse.next({ request: { headers: requestHeaders } })
 
   const hasBackendCookie = Boolean(request.cookies.get(BACKEND_AUTH_COOKIE)?.value)
-  if (hasBackendCookie) return NextResponse.next()
+  if (hasBackendCookie) return NextResponse.next({ request: { headers: requestHeaders } })
 
   if (!isSupabaseConfigured()) {
     const hasDemoCookie = Boolean(request.cookies.get(DEMO_COOKIE)?.value)
@@ -20,10 +22,10 @@ export async function proxy(request: NextRequest) {
       url.searchParams.set('next', request.nextUrl.pathname)
       return NextResponse.redirect(url)
     }
-    return NextResponse.next()
+    return NextResponse.next({ request: { headers: requestHeaders } })
   }
 
-  let response = NextResponse.next({ request })
+  let response = NextResponse.next({ request: { headers: requestHeaders } })
   const supabase = createServerClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, getSupabaseKey(), {
     cookies: {
       getAll() {
@@ -31,7 +33,7 @@ export async function proxy(request: NextRequest) {
       },
       setAll(cookiesToSet) {
         cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
-        response = NextResponse.next({ request })
+        response = NextResponse.next({ request: { headers: requestHeaders } })
         cookiesToSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options))
       }
     }

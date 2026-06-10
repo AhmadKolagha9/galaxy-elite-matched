@@ -315,16 +315,16 @@ textarea { resize: vertical; }
 .pipeline-step span { width: 34px; height: 34px; border-radius: 12px; display: grid; place-items: center; background: var(--cream); font-weight: 950; color: var(--gold-deep); }
 
 .policy-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 18px; }
-.site-footer { background: #03060b; color: white; padding: 56px clamp(20px, 5vw, 84px) 28px; border-top: 1px solid rgba(212,175,102,.18); }
-.footer-grid { display: grid; grid-template-columns: 1.4fr repeat(3, 1fr); gap: 28px; }
-.footer-logo { width: min(420px, 90vw); display: block; margin: -24px 0 -6px -18px; }
-.footer-brand { font-size: 24px; font-weight: 950; letter-spacing: -.04em; color: var(--gold-soft); }
-.site-footer p { color: #aebbd0; }
-.footer-promise { font-weight: 850; color: white !important; }
-.site-footer a { display: block; color: #d7dfeb; margin: 8px 0; }
+.site-footer { background: #03060b; color: white; padding: 30px clamp(20px, 5vw, 84px) 24px; border-top: 1px solid rgba(212,175,102,.18); }
+.footer-compact { display: flex; align-items: center; justify-content: space-between; gap: 28px; }
+.footer-statement { display: flex; align-items: center; gap: 16px; max-width: 620px; }
+.footer-mark { width: 58px; height: 58px; object-fit: contain; filter: drop-shadow(0 10px 24px rgba(212,175,102,.18)); }
+.footer-statement strong { display: block; color: var(--gold-soft); font-size: clamp(20px, 2vw, 26px); letter-spacing: 0; }
+.site-footer p { color: #aebbd0; margin: 8px 0 0; }
+.footer-short-nav { display: flex; align-items: center; justify-content: flex-end; gap: clamp(12px, 2vw, 24px); flex-wrap: wrap; }
+.site-footer a { color: #d7dfeb; font-weight: 850; }
 .site-footer a:hover { color: var(--gold-soft); }
-.site-footer h3 { font-size: 16px; margin-bottom: 12px; color: var(--gold-soft); }
-.footer-bottom { margin-top: 42px; padding-top: 22px; border-top: 1px solid rgba(255,255,255,.12); display: flex; justify-content: space-between; gap: 20px; color: #99a8be; font-size: 13px; }
+.footer-bottom { margin-top: 26px; padding-top: 18px; border-top: 1px solid rgba(255,255,255,.12); display: flex; justify-content: space-between; gap: 20px; color: #99a8be; font-size: 13px; }
 
 @media (max-width: 1150px) {
   .main-nav { display: none; }
@@ -348,6 +348,29 @@ textarea { resize: vertical; }
   .button { justify-content: center; }
   .interest-card dl div { grid-template-columns: 1fr; }
   .footer-bottom { flex-direction: column; }
+}
+
+
+.maintenance-page { min-height: 100vh; display: grid; place-items: center; padding: clamp(20px, 5vw, 84px); background: radial-gradient(circle at 16% 12%, rgba(212,175,102,.20), transparent 30%), var(--gradient-midnight); color: white; }
+.maintenance-hero { width: min(1180px, 100%); display: grid; grid-template-columns: minmax(0, .9fr) minmax(360px, .8fr); gap: clamp(24px, 5vw, 72px); align-items: center; }
+.maintenance-copy h1 { font-size: clamp(42px, 6vw, 82px); max-width: 820px; letter-spacing: 0; }
+.maintenance-copy p:not(.eyebrow) { color: rgba(255,250,240,.78); font-size: clamp(18px, 2vw, 24px); line-height: 1.6; max-width: 680px; }
+.maintenance-copy span { display: inline-flex; margin-top: 18px; color: var(--gold-soft); font-weight: 950; }
+.maintenance-photo { min-height: 430px; border-radius: 8px; overflow: hidden; border: 1px solid rgba(245,223,170,.22); box-shadow: 0 28px 80px rgba(0,0,0,.36); background: rgba(255,255,255,.05); }
+.maintenance-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.site-settings-grid { display: grid; gap: 18px; }
+.site-settings-card { display: grid; gap: 16px; }
+.site-settings-card h2 { font-size: clamp(24px, 3vw, 36px); letter-spacing: 0; }
+.settings-toggle { display: inline-flex; align-items: center; gap: 10px; font-weight: 950; color: var(--ink); }
+.settings-toggle input, .settings-toggle-row input { width: 20px; height: 20px; accent-color: var(--gold); }
+.settings-toggle-list { display: grid; gap: 10px; }
+.settings-toggle-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; background: var(--cream); font-weight: 900; }
+.site-settings-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
+@media (max-width: 820px) {
+  .maintenance-hero { grid-template-columns: 1fr; }
+  .maintenance-photo { min-height: 280px; }
+  .footer-compact { align-items: flex-start; flex-direction: column; }
+  .footer-short-nav { justify-content: flex-start; }
 }
 
 /* Admin control dashboard and strict verification additions */

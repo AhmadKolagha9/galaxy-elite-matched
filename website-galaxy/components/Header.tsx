@@ -26,7 +26,9 @@ function authAwareHref(href: string, authenticated: boolean) {
   return `/login?next=${encodeURIComponent(href)}`
 }
 
-export function Header() {
+type HeaderNavItem = (typeof mainNav)[number]
+
+export function Header({ navItems = mainNav }: { navItems?: HeaderNavItem[] }) {
   const router = useRouter()
   const pathname = usePathname()
   const { user, loading } = useMemberSession()
@@ -51,7 +53,7 @@ export function Header() {
         <span className="sr-only">{site.product}</span>
       </Link>
       <nav className="main-nav" aria-label="Main navigation">
-        {mainNav.map((item) => {
+        {navItems.map((item) => {
           const active = pathname === item.href || pathname.startsWith(`${item.href}/`)
           return <Link key={item.href} className={active ? 'is-active' : undefined} href={authAwareHref(item.href, authenticated)}>{item.label}</Link>
         })}

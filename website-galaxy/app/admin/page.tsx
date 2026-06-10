@@ -29,6 +29,7 @@ export default async function AdminPage() {
         <Link className="button button-outline" href="/admin/private-club-requests">Private Club Requests</Link>
         <Link className="button button-outline" href="/admin/compliance/interest-matches">Interest Matches</Link>
         <Link className="button button-outline" href="/admin/taxonomy">Manage Dropdown Logic</Link>
+        <Link className="button button-outline" href="/admin/site-settings">Site Settings</Link>
       </div>
       <div className="admin-collection-grid">
         {summary.collections.map((collection) => (

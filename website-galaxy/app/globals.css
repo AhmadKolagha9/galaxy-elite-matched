@@ -689,6 +689,19 @@ input[type="date"]::-webkit-calendar-picker-indicator { cursor: pointer; opacity
 .opportunity-mode-summary p:last-child { margin-bottom: 0; color: var(--muted); }
 .private-opportunities-shell .segmented-tabs { margin-left: auto; margin-right: auto; }
 
+
+.submit-workspace { max-width: 1180px; margin: 0 auto; display: grid; gap: 18px; }
+.submit-switcher { display: flex; align-items: center; justify-content: space-between; gap: 18px; border: 1px solid var(--line); border-radius: 8px; background: rgba(255,255,255,.86); padding: clamp(16px, 3vw, 24px); box-shadow: 0 18px 46px rgba(24,24,24,.07); }
+.submit-switcher h2 { margin: 3px 0 6px; font-size: clamp(24px, 3vw, 34px); letter-spacing: 0; }
+.submit-switcher p { margin: 0; color: var(--muted); }
+.submit-switcher .segmented-tabs { flex: 0 0 auto; margin: 0; }
+.submit-form-panel { border: 1px solid var(--line); border-radius: 8px; background: rgba(255,255,255,.76); padding: clamp(14px, 3vw, 24px); box-shadow: 0 18px 46px rgba(24,24,24,.075); }
+.submit-form-panel .premium-form-compact { box-shadow: none; }
+@media (max-width: 760px) {
+  .submit-switcher { align-items: stretch; flex-direction: column; }
+  .submit-switcher .segmented-tabs { width: 100%; }
+}
+
 .private-club-filters { display: grid; gap: 10px; margin: 18px 0 24px; padding: 12px; border: 1px solid var(--line); border-radius: 8px; background: rgba(255,255,255,.9); box-shadow: 0 12px 32px rgba(24,24,24,.055); }
 .private-club-filter-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 1px solid rgba(35,31,32,.08); padding-bottom: 8px; }
 .private-club-filter-head div { display: grid; gap: 2px; }

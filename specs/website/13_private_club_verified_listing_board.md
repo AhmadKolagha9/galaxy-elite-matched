@@ -39,7 +39,7 @@ Filters:
 - payment method
 - keyword/reference search
 
-## Add Property Matched Post
+## Submit Tab Property Post
 
 The add form keeps the existing Verified Listing document and authority fields, then merges the useful Offer Availability fields:
 

@@ -1,8 +1,7 @@
 "use client"
 
 import { useMemo, useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { InterestForm } from '@/components/InterestForm'
+import { useRouter } from 'next/navigation'
 import { StatusBadge } from '@/components/StatusBadge'
 import { useMemberSession } from '@/lib/member-session-client'
 import { hiddenPublicValue, type PublicInterestCard } from '@/lib/public-interest-board'
@@ -25,9 +24,7 @@ function isVerified(status?: string) {
 
 export function InterestBoardClient({ cards }: InterestBoardClientProps) {
   const router = useRouter()
-  const searchParams = useSearchParams()
   const { user, loading } = useMemberSession()
-  const [showForm, setShowForm] = useState(searchParams.get('add') === '1')
   const [activeCard, setActiveCard] = useState<PublicInterestCard | null>(null)
   const [matchCard, setMatchCard] = useState<PublicInterestCard | null>(null)
   const [requesterRole, setRequesterRole] = useState<(typeof requesterRoles)[number]>('the owner')
@@ -38,14 +35,6 @@ export function InterestBoardClient({ cards }: InterestBoardClientProps) {
   const authenticated = Boolean(user)
   const verified = isVerified(user?.verificationStatus)
   const boardNext = useMemo(() => '/interest-board', [])
-
-  function openAddInterest() {
-    if (!authenticated && !loading) {
-      router.push(requireLoginPath('/interest-board?add=1'))
-      return
-    }
-    setShowForm((current) => !current)
-  }
 
   function viewFull(card: PublicInterestCard) {
     if (!authenticated && !loading) {
@@ -110,12 +99,9 @@ export function InterestBoardClient({ cards }: InterestBoardClientProps) {
       <div className="section-heading-inline interest-board-toolbar">
         <div>
           <h2>Interest Board</h2>
-          <p>Browse approved demand signals or add a new interest for Galaxy Elite review.</p>
+          <p>Browse approved demand signals and request matched introductions.</p>
         </div>
-        <button className="button button-gold" type="button" onClick={openAddInterest}>{showForm ? 'Close Add Interest' : 'Add Interest'}</button>
       </div>
-
-      {showForm ? <div id="add-interest" className="interest-board-form-panel"><InterestForm compact /></div> : null}
 
       {cards.length ? (
         <div className="interest-grid">

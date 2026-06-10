@@ -90,7 +90,7 @@ export function InterestBoardManager() {
       }), 'Could not update interest post.')
       setMessage(body.message || 'Interest post updated.')
       await load()
-      if (action === 'draft') router.push('/interest-board?add=1')
+      if (action === 'draft') router.push('/submit?mode=interest')
     } catch (updateError) {
       setError(updateError instanceof Error ? updateError.message : 'Could not update interest post.')
     } finally {
@@ -138,7 +138,7 @@ export function InterestBoardManager() {
     <section className="policy-card profile-management-card interest-manager-card">
       <div className="section-heading-inline">
         <div><h2>Interest Board Manager</h2><p>Manage your posts, incoming matched requests, and sent request history.</p></div>
-        <button className="button button-gold button-small" type="button" onClick={() => router.push('/interest-board?add=1')}>Add Interest</button>
+        <button className="button button-gold button-small" type="button" onClick={() => router.push('/submit?mode=interest')}>Add Interest</button>
       </div>
       <div className="segmented-tabs" role="tablist">
         <button type="button" className={tab === 'posts' ? 'is-active' : ''} onClick={() => setTab('posts')}>My Posts</button>

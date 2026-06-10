@@ -17,14 +17,14 @@ export const site = {
 export const mainNav = [
   { href: '/private-club', label: 'Private Club' },
   { href: '/interest-board', label: 'Interest Board' },
+  { href: '/submit', label: 'Submit' },
   { href: '/private-opportunities', label: 'Private Opportunities' },
   { href: '/market-pulse', label: 'Market Pulse' }
 ]
 
 export const dashboardNav = [
   { href: '/dashboard', label: 'Overview' },
-  { href: '/interest-board?add=1', label: 'Add Interest' },
-  { href: '/private-club?add=1', label: 'Private Club Post' },
+  { href: '/submit', label: 'Submit' },
   { href: '/private-opportunities?mode=investor', label: 'Private Opportunities' },
   { href: '/dashboard/matches', label: 'Matches' },
   { href: '/dashboard/verify', label: 'Verification' },

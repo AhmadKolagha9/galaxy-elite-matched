@@ -19,8 +19,8 @@ export default function Page() {
         <div className="section-heading"><p className="eyebrow">Locations</p><h2>Start focused, scale carefully.</h2></div>
         <div className="logo-strip"><span>India</span></div>
         <div className="hero-actions" style={{ justifyContent: 'center', marginTop: 28 }}>
-          <Link className="button button-gold" href="/post-interest">Post Interest</Link>
-          <Link className="button button-outline" href="/private-club?add=1">Private Club</Link>
+          <Link className="button button-gold" href="/submit?mode=interest">Post Interest</Link>
+          <Link className="button button-outline" href="/submit?mode=property">Private Club</Link>
         </div>
       </section>
     </>

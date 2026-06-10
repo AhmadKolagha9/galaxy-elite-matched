@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
 
-export default function PrivateAvailabilityRedirectPage() {
-  redirect('/private-club?add=1')
+export default function PrivateAvailabilityPage() {
+  redirect('/submit?mode=property')
 }

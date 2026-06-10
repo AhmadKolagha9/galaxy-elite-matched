@@ -1,8 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { VerifiedListingForm } from '@/components/VerifiedListingForm'
+import { useRouter } from 'next/navigation'
 import { StatusBadge } from '@/components/StatusBadge'
 import { useMemberSession } from '@/lib/member-session-client'
 import type { PrivateClubPostCard } from '@/lib/private-club-store'
@@ -34,9 +33,7 @@ function matchesText(value: string, filter: string) {
 
 export function PrivateClubClient({ posts }: { posts: PrivateClubPostCard[] }) {
   const router = useRouter()
-  const searchParams = useSearchParams()
   const { user, loading } = useMemberSession()
-  const [showForm, setShowForm] = useState(searchParams.get('add') === '1')
   const [activePost, setActivePost] = useState<PrivateClubPostCard | null>(null)
   const [matchPost, setMatchPost] = useState<PrivateClubPostCard | null>(null)
   const [requesterRole, setRequesterRole] = useState<(typeof requesterRoles)[number]>('Buyer')
@@ -75,14 +72,6 @@ export function PrivateClubClient({ posts }: { posts: PrivateClubPostCard[] }) {
 
   function clearFilters() {
     setFilters(initialFilters)
-  }
-
-  function openAdd() {
-    if (!authenticated && !loading) {
-      router.push(requireLoginPath('/private-club?add=1'))
-      return
-    }
-    setShowForm((current) => !current)
   }
 
   function viewFull(post: PrivateClubPostCard) {
@@ -147,10 +136,7 @@ export function PrivateClubClient({ posts }: { posts: PrivateClubPostCard[] }) {
           <h2>Private Club Posts</h2>
           <p>Browse approved member-only property posts. Full details and matched requests require a logged-in verified account.</p>
         </div>
-        <button className="button button-gold" type="button" onClick={openAdd}>{showForm ? 'Close Add Property' : 'Add Property Matched Post'}</button>
       </div>
-
-      {showForm ? <div id="add-private-club" className="interest-board-form-panel"><VerifiedListingForm compact /></div> : null}
 
       <section className="private-club-filters" aria-label="Private Club filters">
         <div className="private-club-filter-head">

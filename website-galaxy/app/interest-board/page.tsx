@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { redirect } from 'next/navigation'
 import { InterestBoardClient } from '@/components/InterestBoardClient'
 import { PageHero } from '@/components/PageHero'
 import { fallbackCountries, marketSegmentOptions, propertyTypeOptions } from '@/lib/interest-submission'
@@ -14,11 +15,12 @@ export const metadata: Metadata = pageMetadata({
 })
 
 type InterestBoardPageProps = {
-  searchParams?: Promise<PublicInterestBoardSearchParams>
+  searchParams?: Promise<PublicInterestBoardSearchParams & { add?: string }>
 }
 
 export default async function InterestBoardPage({ searchParams }: InterestBoardPageProps) {
   const params = (await searchParams) || {}
+  if (params.add === '1') redirect('/submit?mode=interest')
   const cards = await getPublicInterestCards(params)
 
   return (

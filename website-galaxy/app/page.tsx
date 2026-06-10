@@ -25,7 +25,7 @@ export default function HomePage() {
           <h1>Private property matching without public listings.</h1>
           <p>{site.description}</p>
           <div className="hero-actions">
-            <Link className="button button-gold" href="/post-interest">Post My Interest</Link>
+            <Link className="button button-gold" href="/submit?mode=interest">Post My Interest</Link>
             <Link className="button button-outline" href="/private-opportunities">Private Opportunities</Link>
             <Link className="button button-outline" href="/private-club">Private Club</Link>
           </div>

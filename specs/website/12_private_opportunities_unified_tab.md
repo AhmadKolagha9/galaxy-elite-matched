@@ -12,7 +12,7 @@ Property supply, private availability, verified property posts, ownership/author
   - Shows the investor demand form only.
   - Requires login through the form/session flow.
 - `/private-availability`
-  - Redirects to `/private-club?add=1`.
+  - Redirects to `/submit?mode=property`.
 - `/investor-post`
   - Redirects to `/private-opportunities?mode=investor` for compatibility.
 - `/dashboard/investor-post`
@@ -32,7 +32,7 @@ Property supply, private availability, verified property posts, ownership/author
 
 Property supply is no longer a separate Offer Availability tab. Users add property supply through:
 
-- `/private-club?add=1`
+- `/submit?mode=property`
 
 The Private Club post form contains the previous Verified Listing document fields plus useful availability fields.
 

@@ -61,7 +61,7 @@ export function PrivateClubManager() {
       }), 'Could not update Private Club post.')
       setMessage(body.message || 'Private Club post updated.')
       await load()
-      if (action === 'draft') router.push('/private-club?add=1')
+      if (action === 'draft') router.push('/submit?mode=property')
     } catch (updateError) {
       setError(updateError instanceof Error ? updateError.message : 'Could not update Private Club post.')
     } finally {
@@ -109,7 +109,7 @@ export function PrivateClubManager() {
     <section className="policy-card profile-management-card interest-manager-card">
       <div className="section-heading-inline">
         <div><h2>Private Club Manager</h2><p>Manage your property posts, incoming matched requests, and sent request history.</p></div>
-        <button className="button button-gold button-small" type="button" onClick={() => router.push('/private-club?add=1')}>Add Private Club Post</button>
+        <button className="button button-gold button-small" type="button" onClick={() => router.push('/submit?mode=property')}>Add Private Club Post</button>
       </div>
       <div className="segmented-tabs" role="tablist">
         <button type="button" className={tab === 'posts' ? 'is-active' : ''} onClick={() => setTab('posts')}>My Posts</button>

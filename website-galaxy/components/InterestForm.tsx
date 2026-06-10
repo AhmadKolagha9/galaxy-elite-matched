@@ -104,7 +104,7 @@ export function InterestForm({ compact = false }: { compact?: boolean }) {
     }
     if (!user) {
       finishError('Member login is required before submitting.')
-      router.push(`/login?next=${encodeURIComponent('/post-interest')}`)
+      router.push(`/login?next=${encodeURIComponent('/submit?mode=interest')}`)
       return
     }
 

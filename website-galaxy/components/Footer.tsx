@@ -18,7 +18,7 @@ export function Footer() {
         </div>
         <div>
           <h3>Platform</h3>
-          <Link href="/post-interest">Post Interest</Link>
+          <Link href="/submit">Submit</Link>
           <Link href="/interest-board">Interest Board</Link>
           <Link href="/private-opportunities">Private Opportunities</Link>
           <Link href="/private-club">Private Club</Link>

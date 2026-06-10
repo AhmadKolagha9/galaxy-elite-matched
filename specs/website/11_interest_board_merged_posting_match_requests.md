@@ -4,7 +4,7 @@
 The public navigation exposes one **Interest Board** entry. The Interest Board page shows approved demand signals, has a top **Add Interest** button, and contains the same fields that previously lived in Post Interest.
 
 ## Board UX
-- `/post-interest` and `/dashboard/post-interest` redirect to `/interest-board?add=1`.
+- `/post-interest`, `/dashboard/post-interest`, and `/interest-board?add=1` redirect to `/submit?mode=interest`.
 - The Interest Board has filters and public-safe interest cards. Each card displays the post reference code for easier customer communication.
 - Each card has:
   - `View Full Interest`: requires login and opens a public-safe detail modal.

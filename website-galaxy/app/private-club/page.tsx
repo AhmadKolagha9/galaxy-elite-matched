@@ -14,14 +14,24 @@ export const metadata: Metadata = pageMetadata({
   noindex: true
 })
 
-export default async function PrivateClubPage() {
+type PrivateClubPageProps = {
+  searchParams?: Promise<{ add?: string }>
+}
+
+export default async function PrivateClubPage({ searchParams }: PrivateClubPageProps) {
+  const params = (await searchParams) || {}
   const user = await getCurrentUser()
+  if (params.add === '1') {
+    const target = '/submit?mode=property'
+    if (!user) redirect(`/login?next=${encodeURIComponent(target)}`)
+    redirect(target)
+  }
   if (!user) redirect('/login?next=/private-club')
   const posts = await getPrivateClubPosts()
   return (
     <>
       <PageHero eyebrow="Private Club" title="Verified private property posts for members only.">
-        <p>Browse approved Private Club property posts, filter by matching criteria, or submit a property matched post for Galaxy Elite compliance review.</p>
+        <p>Browse approved Private Club property posts, filter by matching criteria, and request matched introductions after verification.</p>
       </PageHero>
       <section className="section"><PrivateClubClient posts={posts} /></section>
     </>

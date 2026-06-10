@@ -15,9 +15,9 @@ export const site = {
 }
 
 export const mainNav = [
+  { href: '/private-club', label: 'Private Club' },
   { href: '/interest-board', label: 'Interest Board' },
   { href: '/private-opportunities', label: 'Private Opportunities' },
-  { href: '/private-club', label: 'Private Club' },
   { href: '/market-pulse', label: 'Market Pulse' }
 ]
 

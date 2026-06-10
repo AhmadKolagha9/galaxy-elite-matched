@@ -30,6 +30,16 @@ type VerifiedListingFormProps = {
 export function VerifiedListingForm({ compact = false }: VerifiedListingFormProps) {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [message, setMessage] = useState('')
+  const [selectedAmenities, setSelectedAmenities] = useState<string[]>([])
+  const locked = status === 'loading'
+
+  function toggleAmenity(item: string) {
+    setSelectedAmenities((current) => current.includes(item) ? current.filter((value) => value !== item) : [...current, item])
+  }
+
+  function removeAmenity(item: string) {
+    setSelectedAmenities((current) => current.filter((value) => value !== item))
+  }
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -47,6 +57,7 @@ export function VerifiedListingForm({ compact = false }: VerifiedListingFormProp
     setStatus('success')
     setMessage(body.message || 'Private Club property post submitted for strict compliance review.')
     form.reset()
+    setSelectedAmenities([])
   }
 
   return (
@@ -54,6 +65,11 @@ export function VerifiedListingForm({ compact = false }: VerifiedListingFormProp
       <div className="form-alert form-alert-gold">
         <strong>Private Club review:</strong> property posts stay hidden until Galaxy Elite approves ownership, authority, documents, and compliance status.
       </div>
+      <fieldset className="form-lockset" disabled={locked}>
+        <div className="private-club-form-section">
+          <p className="eyebrow">Property match fields</p>
+          <h3>Core property details</h3>
+        </div>
       <div className="form-grid">
         <label>Title<input name="title" required maxLength={255} placeholder="Example: Private Club villa availability in Dubai" /></label>
         <label>Submitter role<select name="submitterRole" required><option>Direct owner</option><option>Direct landlord</option><option>Developer</option><option>Licensed agent with authority</option><option>Property manager with authority</option><option>Representative with written mandate</option></select></label>
@@ -71,7 +87,7 @@ export function VerifiedListingForm({ compact = false }: VerifiedListingFormProp
         <label>Price / rent range<input name="priceRange" required placeholder="Private verified range" /></label>
         <label>Price / rent min<input name="priceMin" type="number" min="0" step="0.01" /></label>
         <label>Price / rent max<input name="priceMax" type="number" min="0" step="0.01" /></label>
-        <label>Availability date<input name="availabilityDate" type="date" /></label>
+        <label>Availability date<input name="availabilityDate" type="date" onFocus={(event) => event.currentTarget.showPicker?.()} onClick={(event) => event.currentTarget.showPicker?.()} /></label>
         <label>Bedrooms<input name="bedrooms" type="number" min="0" step="1" /></label>
         <label>Rooms<input name="rooms" type="number" min="0" step="1" /></label>
         <label>Total floors<input name="totalFloors" type="number" min="0" step="1" /></label>
@@ -87,14 +103,33 @@ export function VerifiedListingForm({ compact = false }: VerifiedListingFormProp
         <label>Permit status<select name="permitStatus" required><option>Private match only - no public advert requested</option><option>Public advert requested - permit required</option><option>DLD/RERA/Trakheesi/Madmoun available</option><option>UK/India/local compliance to be reviewed</option><option>Not sure - request compliance guidance</option></select></label>
       </div>
 
-      <fieldset className="form-fieldset">
+      <fieldset className="form-fieldset amenities-multiselect">
         <legend>Amenities</legend>
-        <div className="checkbox-grid">
-          {amenitiesOptions.map((item) => <label className="checkbox" key={item}><input type="checkbox" name="amenities" value={item} /> {item}</label>)}
-        </div>
+        {selectedAmenities.map((item) => <input key={item} type="hidden" name="amenities" value={item} />)}
+        <details className="multi-select-dropdown">
+          <summary>{selectedAmenities.length ? `${selectedAmenities.length} selected` : 'Select amenities'}</summary>
+          <div className="multi-select-panel">
+            {amenitiesOptions.map((item) => (
+              <button className={selectedAmenities.includes(item) ? 'multi-select-option is-selected' : 'multi-select-option'} type="button" key={item} onClick={() => toggleAmenity(item)}>
+                <span>{item}</span><strong>{selectedAmenities.includes(item) ? 'Selected' : 'Add'}</strong>
+              </button>
+            ))}
+          </div>
+        </details>
+        {selectedAmenities.length ? (
+          <div className="chip-list" aria-label="Selected amenities">
+            {selectedAmenities.map((item) => (
+              <button key={item} className="chip-item" type="button" onClick={() => removeAmenity(item)}>{item}<span aria-hidden="true">x</span></button>
+            ))}
+          </div>
+        ) : <p className="form-note">Select amenities that help matching quality.</p>}
       </fieldset>
 
       <label>Description<textarea name="description" rows={5} required placeholder="Describe the property, restrictions, verification notes, and matching context. Do not include sensitive personal data." /></label>
+      <div className="private-club-form-section">
+        <p className="eyebrow">Compliance files</p>
+        <h3>Private review documents</h3>
+      </div>
       <div className="document-upload-panel">
         <h3>Document upload checklist</h3>
         <p>Documents remain private and are visible only to Galaxy Elite compliance/admin review.</p>
@@ -112,7 +147,8 @@ export function VerifiedListingForm({ compact = false }: VerifiedListingFormProp
       </div>
       <label className="checkbox"><input type="checkbox" name="strictVerification" required /> I understand this Private Club post cannot be shown until Galaxy Elite approves documents and compliance status.</label>
       <label className="checkbox"><input type="checkbox" name="consent" required /> I confirm I have authority to submit this property information for private verification.</label>
-      <button className="button button-gold" type="submit" disabled={status === 'loading'}>{status === 'loading' ? 'Submitting...' : 'Submit Private Club Post'}</button>
+      </fieldset>
+      <button className="button button-gold" type="submit" disabled={locked}>{locked ? 'Submitting...' : 'Submit Private Club Post'}</button>
       <FormStatus status={status} successMessage={message || 'Private Club post submitted for strict compliance review.'} errorMessage={message || 'Please check the form and try again.'} />
     </form>
   )

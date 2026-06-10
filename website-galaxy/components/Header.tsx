@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { mainNav, site } from '@/lib/site'
 import { useMemberSession } from '@/lib/member-session-client'
 
@@ -28,6 +28,7 @@ function authAwareHref(href: string, authenticated: boolean) {
 
 export function Header() {
   const router = useRouter()
+  const pathname = usePathname()
   const { user, loading } = useMemberSession()
   const authenticated = Boolean(user)
 
@@ -50,9 +51,10 @@ export function Header() {
         <span className="sr-only">{site.product}</span>
       </Link>
       <nav className="main-nav" aria-label="Main navigation">
-        {mainNav.map((item) => (
-          <Link key={item.href} href={authAwareHref(item.href, authenticated)}>{item.label}</Link>
-        ))}
+        {mainNav.map((item) => {
+          const active = pathname === item.href || pathname.startsWith(`${item.href}/`)
+          return <Link key={item.href} className={active ? 'is-active' : undefined} href={authAwareHref(item.href, authenticated)}>{item.label}</Link>
+        })}
       </nav>
       <div className="header-actions">
         {authenticated && user ? (

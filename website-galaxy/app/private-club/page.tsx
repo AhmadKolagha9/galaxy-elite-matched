@@ -9,7 +9,7 @@ import { pageMetadata } from '@/lib/seo'
 export const dynamic = 'force-dynamic'
 export const metadata: Metadata = pageMetadata({
   title: 'Private Club',
-  description: 'Member-only verified property posts and matched requests reviewed by Galaxy Elite.',
+  description: 'Private access to carefully selected property opportunities in a secure Galaxy Elite environment.',
   path: '/private-club',
   noindex: true
 })
@@ -30,8 +30,8 @@ export default async function PrivateClubPage({ searchParams }: PrivateClubPageP
   const posts = await getPrivateClubPosts()
   return (
     <>
-      <PageHero eyebrow="Private Club" title="Verified private property posts for members only.">
-        <p>Browse approved Private Club property posts, filter by matching criteria, and request matched introductions after verification.</p>
+      <PageHero eyebrow="Private Club" title="Private access to better property opportunities.">
+        <p>Join a secure environment for serious buyers, motivated sellers, investors, landlords, tenants and transparent agents who value discretion, quality and trusted connections.</p>
       </PageHero>
       <section className="section"><PrivateClubClient posts={posts} /></section>
     </>

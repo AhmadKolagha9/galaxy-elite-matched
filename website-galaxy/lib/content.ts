@@ -75,10 +75,10 @@ export const interestCards: InterestCardData[] = [
 ]
 
 export const processSteps = [
-  ['Create a verified profile', 'Each person declares their role: buyer, tenant, owner, landlord, developer, agent or representative. No hidden agents.'],
-  ['Post interest or private availability', 'Demand can be visible on the Interest Board. Property supply stays inside the private availability vault.'],
-  ['Match by fit and timing', 'The engine considers country, area, budget, type, size, timeline, verification, privacy and agent preference.'],
-  ['Approve before contact', 'Both sides review limited summaries, approve the match, then enter a private Match Room.']
+  ['Submit your request', 'Tell Galaxy Elite what you are looking for, offering, or representing through one private reviewed workflow.'],
+  ['Private review', 'Your request is checked, filtered and prepared so only serious and relevant matches move forward.'],
+  ['Matched opportunity', 'Galaxy Elite connects real demand with real opportunity while keeping confidential details protected.'],
+  ['Approval before sharing', 'You stay in control. Sensitive information is shared only after the process is approved by both sides.']
 ] as const
 
 export const marketPulse = [

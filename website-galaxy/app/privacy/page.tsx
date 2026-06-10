@@ -2,8 +2,20 @@ import type { Metadata } from 'next'
 import { PageHero } from '@/components/PageHero'
 import { pageMetadata } from '@/lib/seo'
 
-export const metadata: Metadata = pageMetadata({ title: 'Privacy Policy', description: 'Privacy policy placeholder for Galaxy Elite Private Match.', path: '/privacy', noindex: true })
+export const metadata: Metadata = pageMetadata({ title: 'Privacy Policy', description: 'Privacy is part of the Galaxy Elite Private Match service.', path: '/privacy', noindex: true })
 
 export default function PrivacyPage() {
-  return <><PageHero eyebrow="Privacy" title="Privacy-first matching."><p>This starter includes a placeholder. Replace with lawyer-reviewed privacy wording covering consent, verification, data retention, deletion, newsletter consent and country-specific rules.</p></PageHero><section className="section"><div className="policy-card"><h2>Privacy promise</h2><p>Private property availability, contact details, identity documents and match-room documents must stay protected and visible only to authorised users.</p></div></section></>
+  return (
+    <>
+      <PageHero eyebrow="Privacy" title="Your privacy is part of the service.">
+        <p>Galaxy Elite is built around privacy, trust and controlled information sharing. Personal and confidential information is protected throughout the process.</p>
+      </PageHero>
+      <section className="section">
+        <div className="policy-card">
+          <h2>Privacy promise</h2>
+          <p>Sensitive details are only shared after the proper approval process and agreement from both parties. Private property availability, contact details, identity documents and match-room documents stay protected.</p>
+        </div>
+      </section>
+    </>
+  )
 }

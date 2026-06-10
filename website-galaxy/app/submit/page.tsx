@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = pageMetadata({
   title: 'Submit',
-  description: 'Submit Interest Board and Private Club property posts for Galaxy Elite review.',
+  description: 'Submit once, stay private and get matched through Galaxy Elite review.',
   path: '/submit',
   noindex: true
 })
@@ -31,8 +31,8 @@ export default async function SubmitPage({ searchParams }: SubmitPageProps) {
 
   return (
     <>
-      <PageHero eyebrow="Submit" title="Create a reviewed private match record.">
-        <p>Submit Interest Board demand or a Private Club property post through one member workspace.</p>
+      <PageHero eyebrow="Submit Interest" title="Submit once. Stay private. Get matched.">
+        <p>Create your property request or property opportunity with preferred location, area, budget, payment readiness, privacy level and requirements. Galaxy Elite reviews every request before confidential details are shared.</p>
       </PageHero>
       <section className="section">
         <SubmitClient initialMode={mode} />

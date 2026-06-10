@@ -6,10 +6,10 @@ export const site = {
   get url() {
     return process.env.NEXT_PUBLIC_SITE_URL || 'https://yourpropertymatch.cloud'
   },
-  tagline: 'Public Interest. Private Property. Verified Match.',
-  promise: 'No public listings. No spam. No hidden agents. Just verified private property matches.',
+  tagline: 'Submit once. Stay private. Get matched.',
+  promise: 'More privacy, less noise and smarter property matching through Galaxy Elite approval.',
   description:
-    'Galaxy Elite Private Match is a closed property matching experience where buyers, tenants, investors and land seekers post interest, owners and landlords submit availability privately, agents disclose their role, and matches open only after mutual approval.',
+    'Submit your property interest once, and let Galaxy Elite discreetly connect you with the right opportunity. Buy, sell, rent, invest or represent a client with privacy, trusted review and mutual approval before confidential details are shared.',
   whatsapp: process.env.WHATSAPP_NUMBER || '971000000000',
   email: process.env.OPERATIONS_EMAIL || 'hello@yourpropertymatch.cloud'
 }

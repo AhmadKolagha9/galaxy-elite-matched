@@ -14,14 +14,14 @@ const submitModes: { key: SubmitMode; label: string; title: string; body: string
   {
     key: 'interest',
     label: 'Interest Board',
-    title: 'Add Interest Board Post',
-    body: 'Buyer, tenant, investor, and requirement signals submitted for Galaxy Elite review.'
+    title: 'Submit Interest',
+    body: 'Share what you need once, stay private, and let Galaxy Elite review the request before matching.'
   },
   {
     key: 'property',
     label: 'Private Club Property',
-    title: 'Add Private Club Property',
-    body: 'Owner, landlord, developer, and authorized representative property posts submitted for compliance review.'
+    title: 'Submit Property Opportunity',
+    body: 'Submit property details for a private review process before any confidential information is shared.'
   }
 ]
 

@@ -6,7 +6,7 @@ import { pageMetadata } from '@/lib/seo'
 
 export const metadata: Metadata = pageMetadata({
   title: 'Login',
-  description: 'Login to your Galaxy Elite Private Match dashboard.',
+  description: 'Access your private matching account and continue securely with Galaxy Elite.',
   path: '/login',
   noindex: true
 })
@@ -16,8 +16,8 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
   return (
     <section className="auth-section">
       <div className="auth-panel">
-        <p className="eyebrow">Member login</p>
-        <h1>Access your private match dashboard.</h1>
+        <p className="eyebrow">Login</p>
+        <h1>Access your private matching account.</h1>
         <AuthNotice searchParams={params} />
         <LoginForm next={params.next} />
         <p><Link href="/forgot-password"><strong>Forgot password?</strong></Link></p>
@@ -25,12 +25,12 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
       </div>
       <aside className="auth-aside">
         <p className="eyebrow">Protected experience</p>
-        <h2>Login unlocks the private side.</h2>
+        <h2>Your private property journey continues from where you left off.</h2>
         <ul>
-          <li>Post and manage interest signals.</li>
-          <li>Track Open, Matching, Matched and Archived requests.</li>
-          <li>Prepare verified Match Rooms.</li>
-          <li>Use the member session to submit backend-authenticated private match requests.</li>
+          <li>Submit requests and manage your property interests.</li>
+          <li>Track matches and private opportunities.</li>
+          <li>Continue securely with Galaxy Elite review and approval steps.</li>
+          <li>Keep confidential details protected until the right stage.</li>
         </ul>
       </aside>
     </section>

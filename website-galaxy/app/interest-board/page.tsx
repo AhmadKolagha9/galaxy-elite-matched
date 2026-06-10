@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = pageMetadata({
   title: 'Global Interest Board',
-  description: 'Approved buyer, tenant, investor and land seeker demand signals. Property supply stays private until approved matching.',
+  description: 'Real property interest from buyers, sellers, landlords, tenants, investors and agents, shared with privacy.',
   path: '/interest-board'
 })
 
@@ -25,8 +25,8 @@ export default async function InterestBoardPage({ searchParams }: InterestBoardP
 
   return (
     <>
-      <PageHero eyebrow="Interest Board" title="Approved demand signals, not public property adverts.">
-        <p>Only Galaxy Elite approved interests can appear here. Owners, landlords, developers and transparent licensed agents can request to match without exposing property publicly.</p>
+      <PageHero eyebrow="Interest Board" title="Real property interest, shared with privacy.">
+        <p>Explore active property interests without exposing confidential information. Galaxy Elite connects real demand with real opportunity in a controlled, secure and professional way.</p>
       </PageHero>
       <section className="section contrast">
         <form className="board-filter-form" method="GET">

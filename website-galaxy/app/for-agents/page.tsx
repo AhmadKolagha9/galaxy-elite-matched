@@ -5,15 +5,15 @@ import { pageMetadata } from '@/lib/seo'
 
 export const metadata: Metadata = pageMetadata({
   title: 'Transparent Agent Registration',
-  description: 'Licensed agents can join Galaxy Elite Private Match only with clear role, licence and authority disclosure.',
+  description: 'Galaxy Elite helps serious agents connect with genuine property interests through a focused private matching process.',
   path: '/for-agents'
 })
 
 export default function ForAgentsPage() {
   return (
     <>
-      <PageHero eyebrow="No hidden agents" title="Agents can join, but must be transparent.">
-        <p>Galaxy Elite Private Match welcomes professional agents who disclose licence, company, authority and representation side. No fake direct owners. No fake direct buyers.</p>
+      <PageHero eyebrow="Agents" title="Better matches for serious agents.">
+        <p>Register, submit opportunities, and work with serious clients while Galaxy Elite manages privacy, review, approvals and confidential detail sharing.</p>
       </PageHero>
       <section className="section"><AgentForm /></section>
     </>

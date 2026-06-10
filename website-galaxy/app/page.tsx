@@ -22,17 +22,17 @@ export default function HomePage() {
             height="520"
           />
           <p className="eyebrow">{site.company} Private Match</p>
-          <h1>Private property matching without public listings.</h1>
+          <h1>Stop chasing the market. Let the right deal find you.</h1>
           <p>{site.description}</p>
           <div className="hero-actions">
-            <Link className="button button-gold" href="/submit?mode=interest">Post My Interest</Link>
+            <Link className="button button-gold" href="/submit?mode=interest">Submit Interest</Link>
             <Link className="button button-outline" href="/private-opportunities">Private Opportunities</Link>
             <Link className="button button-outline" href="/private-club">Private Club</Link>
           </div>
           <div className="hero-proof">
-            <span>Public Interest</span>
-            <span>Private Property</span>
-            <span>Verified Match</span>
+            <span>Submit once</span>
+            <span>Stay private</span>
+            <span>Get matched</span>
           </div>
         </div>
         <aside className="match-console" aria-label="Private Match console preview">
@@ -65,22 +65,22 @@ export default function HomePage() {
       </section>
 
       <section className="section">
-        <SectionHeading eyebrow="The innovation" title="A different relationship structure for real estate.">
-          Traditional portals show property first. Galaxy Elite Private Match starts with verified intention, private availability and transparent roles.
+        <SectionHeading eyebrow="Why go private?" title="A smarter way to find the best deal.">
+          The open market can be crowded, time-consuming and confusing. Galaxy Elite Private Match gives you a better way forward: submit once, stay private, and focus only on serious relevant matches.
         </SectionHeading>
         <div className="feature-grid feature-grid-large">
-          <article><span>01</span><h3>Public demand</h3><p>Buyers, tenants, investors and land seekers post what they want, while controlling budget visibility.</p></article>
-          <article><span>02</span><h3>Private supply</h3><p>Owners, landlords and developers can respond without exposing address, photos, price, documents or identity online.</p></article>
-          <article><span>03</span><h3>Transparent agents</h3><p>Agents are welcome only when they disclose company, licence, authority and representation side.</p></article>
-          <article><span>04</span><h3>Mutual approval</h3><p>No one connects until both sides approve and a private Match Room opens.</p></article>
-          <article><span>05</span><h3>Verified listing requests</h3><p>Listings require title deed, owner ID, authority, permit checks and admin approval before visibility.</p></article>
-          <article><span>06</span><h3>Control dashboard</h3><p>Galaxy Elite reviews every post, investor signal, agent registration and verified listing request before anything is published.</p></article>
+          <article><span>01</span><h3>Submit once</h3><p>Share your location, budget, payment readiness, privacy level and property requirements through one reviewed request.</p></article>
+          <article><span>02</span><h3>Stay private</h3><p>Personal, property and confidential details remain protected until the proper approval stage.</p></article>
+          <article><span>03</span><h3>Serious roles only</h3><p>Buyers, sellers, tenants, landlords, investors and agents move through a professional process with clear role disclosure.</p></article>
+          <article><span>04</span><h3>Mutual approval</h3><p>Confidential details are shared only when Galaxy Elite approval and both-party agreement are in place.</p></article>
+          <article><span>05</span><h3>Filtered opportunities</h3><p>Galaxy Elite reviews, filters and matches each request so members spend less time chasing irrelevant leads.</p></article>
+          <article><span>06</span><h3>Trusted control</h3><p>Every public or private step is governed by review, privacy rules and controlled information sharing.</p></article>
         </div>
       </section>
 
       <section className="section contrast">
-        <SectionHeading eyebrow="Interest Board" title="Verified interest signals, not public property adverts.">
-          The board shows what serious people are looking for. The private property side stays in the Availability Vault until approval.
+        <SectionHeading eyebrow="Interest Board" title="Real property interest, shared with privacy.">
+          Explore active interests from buyers, sellers, landlords, tenants, investors and agents without exposing confidential information before the right stage.
         </SectionHeading>
         <div className="interest-grid">
           {interestCards.slice(0, 3).map((card) => <InterestCard key={card.id} card={card} />)}
@@ -90,8 +90,8 @@ export default function HomePage() {
       <section className="section split">
         <div>
           <p className="eyebrow">How it works</p>
-          <h2>From intention to agreement, every stage is controlled.</h2>
-          <p>Private matching feels like a relationship platform, but backed by brokerage process, verification and clear status tracking.</p>
+          <h2>One request. Private review. The right match.</h2>
+          <p>Tell Galaxy Elite what you are looking for. We review, filter and match suitable opportunities while protecting your information and keeping you in control.</p>
         </div>
         <div className="steps compact-steps">
           {processSteps.map(([title, text], index) => (

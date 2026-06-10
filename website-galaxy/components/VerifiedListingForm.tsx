@@ -9,8 +9,7 @@ import {
   listingIntentOptions,
   marketSegmentOptions,
   propertyTypeOptions,
-  purposeOptions,
-  verificationDocumentTypes
+  purposeOptions
 } from '@/lib/taxonomy'
 import {
   amenitiesOptions,
@@ -131,11 +130,8 @@ export function VerifiedListingForm({ compact = false }: VerifiedListingFormProp
         <h3>Private review documents</h3>
       </div>
       <div className="document-upload-panel">
-        <h3>Document upload checklist</h3>
+        <h3>Private document uploads</h3>
         <p>Documents remain private and are visible only to Galaxy Elite compliance/admin review.</p>
-        <div className="document-checklist">
-          {verificationDocumentTypes.map((doc) => <span key={doc}>{doc}</span>)}
-        </div>
         <div className="form-grid">
           <label>Title deed / ownership proof<input name="titleDeed" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp" /></label>
           <label>Owner ID / passport / Emirates ID<input name="ownerId" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp" /></label>

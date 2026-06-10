@@ -19,7 +19,7 @@ export default function Page() {
         <div>
           <h2>Private by default. Verified by process.</h2>
           <p>Landlords can register future availability and match tenants by move-in month, rent range, area and verification readiness before public advertising.</p>
-          <div className="hero-actions"><Link className="button button-gold" href="/private-opportunities?mode=availability">Submit Private Availability</Link><Link className="button button-outline" href="/interest-board">View Interest Board</Link></div>
+          <div className="hero-actions"><Link className="button button-gold" href="/private-club?add=1">Add Private Club Post</Link><Link className="button button-outline" href="/interest-board">View Interest Board</Link></div>
         </div>
         <div className="policy-grid">
           <article className="policy-card"><h3>Privacy</h3><p>Exact property identity stays hidden until a private match is approved.</p></article>

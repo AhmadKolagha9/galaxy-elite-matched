@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
 
 export default function PrivateAvailabilityRedirectPage() {
-  redirect('/private-opportunities?mode=availability')
+  redirect('/private-club?add=1')
 }

@@ -688,3 +688,10 @@ input[type="date"]::-webkit-calendar-picker-indicator { cursor: pointer; opacity
 .opportunity-mode-summary h2 { margin: 6px 0 8px; font-size: clamp(24px, 3vw, 36px); letter-spacing: 0; }
 .opportunity-mode-summary p:last-child { margin-bottom: 0; color: var(--muted); }
 .private-opportunities-shell .segmented-tabs { margin-left: auto; margin-right: auto; }
+
+.private-club-filters { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; margin: 22px 0 28px; padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: rgba(255,255,255,.88); box-shadow: 0 14px 36px rgba(24,24,24,.06); }
+.private-club-filters label { font-size: 13px; font-weight: 850; color: var(--ink-2); }
+.private-club-filters input, .private-club-filters select { margin-top: 6px; min-height: 42px; }
+.private-club-workspace .interest-card dl { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (max-width: 980px) { .private-club-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 620px) { .private-club-filters { grid-template-columns: 1fr; } }

@@ -4,20 +4,18 @@ import { PrivateOpportunitiesClient } from '@/components/PrivateOpportunitiesCli
 import { pageMetadata } from '@/lib/seo'
 
 export const metadata: Metadata = pageMetadata({
-  title: 'Private Opportunities',
-  description: 'Submit private supply availability or investor demand through one Galaxy Elite review-first workflow.',
+  title: 'Investor Demand',
+  description: 'Submit private investor demand through Galaxy Elite review-first workflow.',
   path: '/private-opportunities'
 })
 
-export default function PrivateOpportunitiesPage({ searchParams }: { searchParams?: { mode?: string | string[] } }) {
-  const mode = Array.isArray(searchParams?.mode) ? searchParams?.mode[0] : searchParams?.mode
-
+export default function PrivateOpportunitiesPage() {
   return (
     <>
-      <PageHero eyebrow="Private opportunities" title="One place for private supply and investor demand.">
-        <p>Choose the right workflow below. Availability and investor demand stay private by default, enter Galaxy Elite review, and only move forward through controlled matching and approval.</p>
+      <PageHero eyebrow="Investor demand" title="Post investor demand for private matching.">
+        <p>Private Club now handles property supply. Use this page when capital is looking for a specific asset, ticket range, yield profile or development opportunity.</p>
       </PageHero>
-      <section className="section"><PrivateOpportunitiesClient initialMode={mode} /></section>
+      <section className="section"><PrivateOpportunitiesClient /></section>
     </>
   )
 }

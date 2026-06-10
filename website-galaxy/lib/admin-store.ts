@@ -31,7 +31,7 @@ export type SubmissionRecord = {
 const labels: Record<CollectionKey, string> = {
   interest: 'Interest Posts',
   availability: 'Private Availability',
-  verifiedListing: 'Verified Listing Requests',
+  verifiedListing: 'Private Club Posts',
   investor: 'Investor Posts',
   agent: 'Agent Registrations',
   newsletter: 'Newsletter'

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { mainNav, site } from '@/lib/site'
 import { useMemberSession } from '@/lib/member-session-client'
 
-const protectedPathPrefixes = ['/private-opportunities', '/private-availability', '/investor-post']
+const protectedPathPrefixes = ['/private-club', '/verified-listing', '/private-opportunities', '/private-availability', '/investor-post']
 
 
 function initials(name: string, email: string) {

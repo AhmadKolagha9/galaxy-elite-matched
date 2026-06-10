@@ -27,7 +27,7 @@ export default function HomePage() {
           <div className="hero-actions">
             <Link className="button button-gold" href="/post-interest">Post My Interest</Link>
             <Link className="button button-outline" href="/private-opportunities">Private Opportunities</Link>
-            <Link className="button button-outline" href="/verified-listing">Verified Listing Request</Link>
+            <Link className="button button-outline" href="/private-club">Private Club</Link>
           </div>
           <div className="hero-proof">
             <span>Public Interest</span>

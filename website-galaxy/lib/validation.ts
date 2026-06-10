@@ -47,7 +47,9 @@ export const availabilitySchema = z.object({
 })
 
 export const verifiedListingSchema = z.object({
+  title: optionalText,
   submitterRole: z.string().min(2),
+  availabilityType: z.string().min(2),
   listingIntent: z.string().min(2),
   marketSegment: z.string().min(2),
   purpose: z.string().min(2),
@@ -57,14 +59,25 @@ export const verifiedListingSchema = z.object({
   buildingName: optionalText,
   propertyType: z.string().min(2),
   size: optionalText,
+  sizeSqft: optionalText,
   priceRange: z.string().min(1),
+  priceMin: optionalText,
+  priceMax: optionalText,
   availabilityDate: optionalText,
+  bedrooms: optionalText,
+  rooms: optionalText,
+  totalFloors: optionalText,
+  parkingSpaces: optionalText,
+  category: optionalText,
+  offeringType: optionalText,
+  furnishingType: optionalText,
+  projectStatus: optionalText,
+  preferredPaymentMethod: optionalText,
+  privacyLevel: z.string().min(2),
+  authorityDeclaration: z.string().min(2),
   ownershipStatus: z.string().min(2),
   permitStatus: z.string().min(2),
   description: z.string().min(10),
-  name: z.string().min(2),
-  email: z.string().email(),
-  phone: z.string().min(5),
   strictVerification: consentSchema,
   consent: consentSchema
 })

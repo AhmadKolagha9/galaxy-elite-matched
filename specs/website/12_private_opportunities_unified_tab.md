@@ -1,39 +1,24 @@
-# Private Opportunities Unified Tab - Website
+# Private Opportunities Investor Demand Tab - Website
 
-## Goal
+## Current Direction
 
-Merge the public website entry point for Private Availability and Investor Post into one authenticated tab named **Private Opportunities** while preserving the different form fields and business logic for each workflow.
+Private Opportunities is now reserved for **Investor Demand** only.
+
+Property supply, private availability, verified property posts, ownership/authority documents, and add-property matched posts belong in the member-only **Private Club** workflow.
 
 ## Routes
 
 - `/private-opportunities`
-  - Primary public navigation route.
-  - Shows a segmented control with:
-    - `Offer Availability`
-    - `Investor Demand`
-  - Uses the existing Private Availability form for supply-side records.
-  - Uses the existing Investor Post form for demand-side records.
+  - Shows the investor demand form only.
+  - Requires login through the form/session flow.
 - `/private-availability`
-  - Redirects to `/private-opportunities?mode=availability`.
+  - Redirects to `/private-club?add=1`.
 - `/investor-post`
-  - Redirects to `/private-opportunities?mode=investor`.
+  - Redirects to `/private-opportunities?mode=investor` for compatibility.
 - `/dashboard/investor-post`
   - Redirects to `/private-opportunities?mode=investor`.
 
-## Form Logic
-
-### Offer Availability
-
-- Submits owner, landlord, developer, agent, or representative availability.
-- Keeps ownership document attachment optional.
-- Uploads documents privately before final submission.
-- Sends payload with `opportunity_type = availability`.
-- Existing review defaults remain:
-  - `approval_status = pending_review`
-  - `public_status = hidden`
-  - `verification_status = unverified`
-
-### Investor Demand
+## Investor Demand Logic
 
 - Submits investor demand without ownership document tools.
 - Keeps investor-specific fields such as ticket range, yield, risk, financing method, and respondent permissions.
@@ -43,27 +28,16 @@ Merge the public website entry point for Private Availability and Investor Post 
   - `public_status = hidden`
   - `verification_status = unverified`
 
-## API Dispatch
+## Property Supply Logic
 
-Website forms post to `/api/private-opportunities`.
+Property supply is no longer a separate Offer Availability tab. Users add property supply through:
 
-The Next.js API route validates the shared discriminator:
+- `/private-club?add=1`
 
-- `availability` routes to `/api/availability`.
-- `investor` routes to `/api/investor-post`.
-
-The session user is converted into the backend Bearer token server-side. The client cannot choose user id, role, approval status, public status, or verification status.
-
-## Navigation
-
-- Header shows one tab: **Private Opportunities**.
-- The old standalone `Private Availability` and hidden `Investor Post` navigation entries are not shown.
-- Footer and market/role CTAs point to `/private-opportunities` with the correct mode where useful.
+The Private Club post form contains the previous Verified Listing document fields plus useful availability fields.
 
 ## Acceptance Checks
 
-- A logged-out user clicking Private Opportunities is sent to login with the correct `next` URL.
-- A logged-in user can switch between both forms without losing route clarity.
-- Availability submissions still support optional ownership documents.
-- Investor demand submissions do not render ownership document controls.
-- Old links redirect cleanly.
+- Private Opportunities no longer renders an Offer Availability tab.
+- Availability CTAs point to Private Club add-post mode.
+- Investor demand submissions still route through the existing investor endpoint/dispatcher.

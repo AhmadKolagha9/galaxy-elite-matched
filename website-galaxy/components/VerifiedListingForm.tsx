@@ -2,45 +2,102 @@
 
 import { useState } from 'react'
 import { FormStatus } from '@/components/FormStatus'
-import { areaCityOptions, countryOptions, listingIntentOptions, marketSegmentOptions, propertyTypeOptions, purposeOptions, verificationDocumentTypes } from '@/lib/taxonomy'
+import {
+  areaCityOptions,
+  availabilityTypeOptions,
+  countryOptions,
+  listingIntentOptions,
+  marketSegmentOptions,
+  propertyTypeOptions,
+  purposeOptions,
+  verificationDocumentTypes
+} from '@/lib/taxonomy'
+import {
+  amenitiesOptions,
+  authorityDeclarationOptions,
+  categoryOptions,
+  furnishingTypeOptions,
+  offeringTypeOptions,
+  preferredPaymentMethodOptions,
+  privacyLevelOptions,
+  projectStatusOptions
+} from '@/lib/availability-submission'
 
-export function VerifiedListingForm() {
+type VerifiedListingFormProps = {
+  compact?: boolean
+}
+
+export function VerifiedListingForm({ compact = false }: VerifiedListingFormProps) {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+  const [message, setMessage] = useState('')
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setStatus('loading')
-    const formData = new FormData(event.currentTarget)
+    setMessage('')
+    const form = event.currentTarget
+    const formData = new FormData(form)
     const response = await fetch('/api/verified-listing', { method: 'POST', body: formData })
-    setStatus(response.ok ? 'success' : 'error')
-    if (response.ok) event.currentTarget.reset()
+    const body = await response.json().catch(() => null) as { ok?: boolean; message?: string; error?: string; id?: string } | null
+    if (!response.ok || !body?.ok) {
+      setStatus('error')
+      setMessage(body?.error || body?.message || 'Private Club post submission failed.')
+      return
+    }
+    setStatus('success')
+    setMessage(body.message || 'Private Club property post submitted for strict compliance review.')
+    form.reset()
   }
 
   return (
-    <form className="premium-form" onSubmit={onSubmit}>
+    <form className={`premium-form ${compact ? 'premium-form-compact' : ''}`} onSubmit={onSubmit}>
       <div className="form-alert form-alert-gold">
-        <strong>Strict verification:</strong> a verified listing cannot go live until Galaxy Elite approves ownership, authority, ID, document quality, and local permit requirements where applicable.
+        <strong>Private Club review:</strong> property posts stay hidden until Galaxy Elite approves ownership, authority, documents, and compliance status.
       </div>
       <div className="form-grid">
-        <label>Submitter role<select name="submitterRole" required><option>Direct owner</option><option>Direct landlord</option><option>Developer</option><option>Licensed agent with authority</option><option>Property manager with authority</option></select></label>
+        <label>Title<input name="title" required maxLength={255} placeholder="Example: Private Club villa availability in Dubai" /></label>
+        <label>Submitter role<select name="submitterRole" required><option>Direct owner</option><option>Direct landlord</option><option>Developer</option><option>Licensed agent with authority</option><option>Property manager with authority</option><option>Representative with written mandate</option></select></label>
+        <label>Availability type<select name="availabilityType" required>{availabilityTypeOptions.map((item) => <option key={item}>{item}</option>)}</select></label>
         <label>Listing intent<select name="listingIntent" required>{listingIntentOptions.map((item) => <option key={item}>{item}</option>)}</select></label>
+        <label>Requirement type<select name="purpose" required>{purposeOptions.map((item) => <option key={item}>{item}</option>)}</select></label>
         <label>Market segment<select name="marketSegment" required>{marketSegmentOptions.map((item) => <option key={item}>{item}</option>)}</select></label>
-        <label>Purpose<select name="purpose" required>{purposeOptions.map((item) => <option key={item}>{item}</option>)}</select></label>
         <label>Property type<select name="propertyType" required>{propertyTypeOptions.map((type) => <option key={type}>{type}</option>)}</select></label>
         <label>Country<select name="country" required>{countryOptions.map((country) => <option key={country}>{country}</option>)}</select></label>
         <label>Area / city<select name="cityArea" required>{areaCityOptions.map((area) => <option key={area}>{area}</option>)}</select></label>
-        <label>Project / community name<input name="projectName" placeholder="Project, community, development or master plan" /></label>
-        <label>Building / tower name<input name="buildingName" placeholder="Building, tower, phase or plot reference" /></label>
-        <label>Size<input name="size" placeholder="Bedrooms, sq ft, sq m, acres, units, camp capacity" /></label>
-        <label>Price / rent range<input name="priceRange" required placeholder="Price/rent range for private verification" /></label>
-        <label>Availability date<input name="availabilityDate" placeholder="Now, vacant from, handover date, Q4 2026" /></label>
+        <label>Project / community<input name="projectName" placeholder="Project, community, development or master plan" /></label>
+        <label>Building / tower<input name="buildingName" placeholder="Building, tower, phase or plot reference" /></label>
+        <label>Size label<input name="size" placeholder="Bedrooms, sq ft, sq m, acres, units, camp capacity" /></label>
+        <label>Size, sqft<input name="sizeSqft" type="number" min="0" step="0.01" /></label>
+        <label>Price / rent range<input name="priceRange" required placeholder="Private verified range" /></label>
+        <label>Price / rent min<input name="priceMin" type="number" min="0" step="0.01" /></label>
+        <label>Price / rent max<input name="priceMax" type="number" min="0" step="0.01" /></label>
+        <label>Availability date<input name="availabilityDate" type="date" /></label>
+        <label>Bedrooms<input name="bedrooms" type="number" min="0" step="1" /></label>
+        <label>Rooms<input name="rooms" type="number" min="0" step="1" /></label>
+        <label>Total floors<input name="totalFloors" type="number" min="0" step="1" /></label>
+        <label>Parking spaces<input name="parkingSpaces" type="number" min="0" step="1" /></label>
+        <label>Category<select name="category" required>{categoryOptions.map((item) => <option key={item}>{item}</option>)}</select></label>
+        <label>Offering type<select name="offeringType" required>{offeringTypeOptions.map((item) => <option key={item}>{item}</option>)}</select></label>
+        <label>Furnishing<select name="furnishingType" required>{furnishingTypeOptions.map((item) => <option key={item}>{item}</option>)}</select></label>
+        <label>Project status<select name="projectStatus" required>{projectStatusOptions.map((item) => <option key={item}>{item}</option>)}</select></label>
+        <label>Preferred payment<select name="preferredPaymentMethod" required>{preferredPaymentMethodOptions.map((item) => <option key={item}>{item}</option>)}</select></label>
+        <label>Privacy level<select name="privacyLevel" required>{privacyLevelOptions.map((item) => <option key={item}>{item}</option>)}</select></label>
+        <label>Authority declaration<select name="authorityDeclaration" required>{authorityDeclarationOptions.map((item) => <option key={item}>{item}</option>)}</select></label>
         <label>Ownership status<select name="ownershipStatus" required><option>Direct owner confirmed</option><option>Owner authority available</option><option>Developer authority available</option><option>POA available</option><option>Documents pending</option></select></label>
         <label>Permit status<select name="permitStatus" required><option>Private match only - no public advert requested</option><option>Public advert requested - permit required</option><option>DLD/RERA/Trakheesi/Madmoun available</option><option>UK/India/local compliance to be reviewed</option><option>Not sure - request compliance guidance</option></select></label>
       </div>
-      <label>Description<textarea name="description" rows={5} required placeholder="Describe the property, land, office, camp, off-plan/secondary status, restrictions and verification notes. Do not include sensitive personal data in this description." /></label>
+
+      <fieldset className="form-fieldset">
+        <legend>Amenities</legend>
+        <div className="checkbox-grid">
+          {amenitiesOptions.map((item) => <label className="checkbox" key={item}><input type="checkbox" name="amenities" value={item} /> {item}</label>)}
+        </div>
+      </fieldset>
+
+      <label>Description<textarea name="description" rows={5} required placeholder="Describe the property, restrictions, verification notes, and matching context. Do not include sensitive personal data." /></label>
       <div className="document-upload-panel">
         <h3>Document upload checklist</h3>
-        <p>Upload available documents for review. This starter stores document metadata locally; production should use Supabase Storage or secure cloud storage with access controls.</p>
+        <p>Documents remain private and are visible only to Galaxy Elite compliance/admin review.</p>
         <div className="document-checklist">
           {verificationDocumentTypes.map((doc) => <span key={doc}>{doc}</span>)}
         </div>
@@ -53,15 +110,10 @@ export function VerifiedListingForm() {
           <label>Floor plan / photos / supporting docs<input name="supportingDocuments" type="file" multiple accept=".pdf,.jpg,.jpeg,.png,.webp" /></label>
         </div>
       </div>
-      <div className="form-grid">
-        <label>Name<input name="name" required /></label>
-        <label>Email<input name="email" type="email" required /></label>
-        <label>Phone / WhatsApp<input name="phone" required /></label>
-      </div>
-      <label className="checkbox"><input type="checkbox" name="strictVerification" required /> I understand this cannot be listed as verified until Galaxy Elite approves the documents and compliance status.</label>
+      <label className="checkbox"><input type="checkbox" name="strictVerification" required /> I understand this Private Club post cannot be shown until Galaxy Elite approves documents and compliance status.</label>
       <label className="checkbox"><input type="checkbox" name="consent" required /> I confirm I have authority to submit this property information for private verification.</label>
-      <button className="button button-gold" type="submit">Submit Verified Listing Request</button>
-      <FormStatus status={status} successMessage="Verified listing request submitted for strict compliance review." />
+      <button className="button button-gold" type="submit" disabled={status === 'loading'}>{status === 'loading' ? 'Submitting...' : 'Submit Private Club Post'}</button>
+      <FormStatus status={status} successMessage={message || 'Private Club post submitted for strict compliance review.'} errorMessage={message || 'Please check the form and try again.'} />
     </form>
   )
 }

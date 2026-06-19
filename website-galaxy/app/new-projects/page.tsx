@@ -20,6 +20,15 @@ function uniqueOptions(projects: PublicNewProject[], key: 'countryId' | 'cityId'
   return [...new Set(projects.map((project) => project[key]).filter((value): value is string => Boolean(value)))].sort((a, b) => a.localeCompare(b))
 }
 
+function hasActiveFilters(params: NewProjectSearchParams) {
+  return Boolean(params.country || params.city || params.developer || params.keyword || params.min_price || params.max_price)
+}
+
+function resultLabel(count: number) {
+  if (count === 1) return '1 published project'
+  return `${count} published projects`
+}
+
 function ProjectCard({ project }: { project: PublicNewProject }) {
   const image = project.images[0]
   return (
@@ -61,17 +70,25 @@ export default async function NewProjectsPage({ searchParams }: NewProjectsPageP
         <p>Explore developer-led projects reviewed by Galaxy Elite. Public project details stay curated, while direct contact and private fields remain controlled.</p>
       </PageHero>
       <section className="section contrast">
-        <form className="board-filter-form project-filter-form" method="GET">
-          <label>Country<select name="country" defaultValue={params.country || ''}><option value="">All countries</option>{countries.map((country) => <option key={country} value={country}>{country}</option>)}</select></label>
-          <label>City<select name="city" defaultValue={params.city || ''}><option value="">All cities</option>{cities.map((city) => <option key={city} value={city}>{city}</option>)}</select></label>
-          <label>Developer<select name="developer" defaultValue={params.developer || ''}><option value="">All developers</option>{developers.map((developer) => <option key={developer} value={developer}>{developer}</option>)}</select></label>
-          <label>Keyword<input name="keyword" defaultValue={params.keyword || ''} placeholder="Project or reference" /></label>
-          <label>Min price<input name="min_price" type="number" min="0" defaultValue={params.min_price || ''} /></label>
-          <label>Max price<input name="max_price" type="number" min="0" defaultValue={params.max_price || ''} /></label>
-          <button className="button button-dark" type="submit">Apply Filters</button>
-        </form>
-        <div className="hero-proof" style={{ justifyContent: 'center', marginBottom: 28 }}>
-          <span>Public browse</span><span>Admin published</span><span>Developer projects</span><span>Contact controlled</span>
+        <div className="project-board-tools">
+          <div className="project-results-bar">
+            <div>
+              <p className="eyebrow">Project finder</p>
+              <h2>{resultLabel(projects.length)}</h2>
+            </div>
+            {hasActiveFilters(params) ? <Link className="button button-outline button-small" href="/new-projects">Clear Filters</Link> : null}
+          </div>
+          <form className="project-filter-form" method="GET">
+            <label className="project-filter-search">Search<input name="keyword" defaultValue={params.keyword || ''} placeholder="Project name, developer, or NP reference" /></label>
+            <label>Country<select name="country" defaultValue={params.country || ''}><option value="">All countries</option>{countries.map((country) => <option key={country} value={country}>{country}</option>)}</select></label>
+            <label>City<select name="city" defaultValue={params.city || ''}><option value="">All cities</option>{cities.map((city) => <option key={city} value={city}>{city}</option>)}</select></label>
+            <label>Developer<select name="developer" defaultValue={params.developer || ''}><option value="">All developers</option>{developers.map((developer) => <option key={developer} value={developer}>{developer}</option>)}</select></label>
+            <div className="project-price-group" aria-label="Price range">
+              <label>Min price<input name="min_price" type="number" min="0" inputMode="numeric" defaultValue={params.min_price || ''} placeholder="0" /></label>
+              <label>Max price<input name="max_price" type="number" min="0" inputMode="numeric" defaultValue={params.max_price || ''} placeholder="Any" /></label>
+            </div>
+            <button className="button button-dark project-filter-submit" type="submit">Apply Filters</button>
+          </form>
         </div>
         <div className="project-grid">
           {projects.map((project) => <ProjectCard key={project.reference} project={project} />)}

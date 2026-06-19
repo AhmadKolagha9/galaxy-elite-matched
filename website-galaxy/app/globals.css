@@ -761,9 +761,18 @@ input[type="date"]::-webkit-calendar-picker-indicator { cursor: pointer; opacity
 
 
 /* New Projects public board */
-.project-filter-form { grid-template-columns: repeat(3, minmax(0, 1fr)) auto; }
+.project-board-tools { max-width: 1180px; margin: 0 auto 30px; background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: clamp(16px, 3vw, 24px); box-shadow: 0 18px 45px rgba(8,17,31,.07); }
+.project-results-bar { display: flex; align-items: end; justify-content: space-between; gap: 18px; margin-bottom: 18px; padding-bottom: 16px; border-bottom: 1px solid rgba(8,17,31,.08); }
+.project-results-bar h2 { font-size: clamp(26px, 3vw, 40px); letter-spacing: 0; }
+.project-filter-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; align-items: end; }
+.project-filter-form label { min-width: 0; }
+.project-filter-search { grid-column: span 2; }
+.project-filter-search input { min-height: 52px; }
+.project-price-group { display: grid; grid-template-columns: repeat(2, minmax(110px, 1fr)); gap: 10px; grid-column: span 2; }
+.project-filter-submit { min-height: 52px; white-space: nowrap; }
 .project-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
-.project-card { background: var(--cream); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 20px 55px rgba(8,17,31,.08); }
+.project-card { background: var(--cream); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 20px 55px rgba(8,17,31,.08); transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
+.project-card:hover { transform: translateY(-2px); border-color: rgba(212,175,102,.36); box-shadow: 0 26px 70px rgba(8,17,31,.12); }
 .project-card-media { display: block; aspect-ratio: 16 / 10; background: var(--midnight); overflow: hidden; }
 .project-card-media img, .project-detail-media img, .project-gallery-grid img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .project-card-placeholder { min-height: 100%; display: grid; place-items: center; background: var(--gradient-midnight); color: var(--gold-soft); font-weight: 950; }
@@ -782,7 +791,9 @@ input[type="date"]::-webkit-calendar-picker-indicator { cursor: pointer; opacity
 
 @media (max-width: 1050px) {
   .project-grid, .project-detail-hero, .project-detail-section { grid-template-columns: 1fr; }
+  .project-filter-search, .project-price-group { grid-column: auto; }
 }
 @media (max-width: 720px) {
-  .project-filter-form, .project-gallery-grid { grid-template-columns: 1fr; }
+  .project-results-bar { align-items: flex-start; flex-direction: column; }
+  .project-filter-form, .project-gallery-grid, .project-price-group { grid-template-columns: 1fr; }
 }

@@ -14,7 +14,11 @@ const normalizeActionType = (actionType: string) => {
     taxonomy_create: "modify_taxonomy",
     taxonomy_update: "modify_taxonomy",
     taxonomy_archive: "modify_taxonomy",
-    taxonomy_import_create: "modify_taxonomy"
+    taxonomy_import_create: "modify_taxonomy",
+    new_project_create: "new_project_create",
+    new_project_update: "new_project_update",
+    new_project_status_update: "new_project_status_update",
+    new_project_archive: "new_project_archive"
   };
   return map[actionType] ?? actionType.replace(/-/g, "_");
 };

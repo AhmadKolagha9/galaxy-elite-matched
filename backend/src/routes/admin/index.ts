@@ -9,6 +9,7 @@ import { adminVerificationQueueRouter } from "./verification-queue.js";
 import { adminMatchesRouter } from "./matches.js";
 import { adminInterestMatchRequestsRouter } from "./interest-match-requests.js";
 import { adminMatchRoomsRouter } from "./match-rooms.js";
+import { adminNewProjectsRouter } from "./new-projects.js";
 import { adminAuditLogRouter } from "./audit-log.js";
 import { adminAgentApplicationsRouter } from "./agent-applications.js";
 
@@ -27,4 +28,5 @@ adminRouter.use("/taxonomy", adminTaxonomyRouter);
 adminRouter.use("/matches", adminMatchesRouter);
 adminRouter.use("/interest-match-requests", adminInterestMatchRequestsRouter);
 adminRouter.use("/match-rooms", adminMatchRoomsRouter);
+adminRouter.use("/new-projects", adminNewProjectsRouter);
 adminRouter.use("/audit-log", adminAuditLogRouter);

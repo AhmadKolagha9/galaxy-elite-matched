@@ -31,6 +31,7 @@ export default async function ControlOverviewPage() {
           <Link className="button button-gold" href="/submissions">Open Submissions</Link>
           <Link className="button button-outline" href="/documents">Review Documents</Link>
           <Link className="button button-outline" href="/matches">Manage Matches</Link>
+          <Link className="button button-outline" href="/new-projects">New Projects</Link>
         </div>
       </div>
     </section>

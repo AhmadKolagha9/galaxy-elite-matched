@@ -251,3 +251,170 @@ export async function getAuditLog(limit = 250) {
   const body = await controlFetch<{ ok: true; actions: Array<Record<string, unknown>> }>(`/api/admin/audit-log?${params}`)
   return body.actions.map(normalizeAuditAction)
 }
+
+
+export type NewProjectStatus = 'draft' | 'published' | 'archived'
+
+export type ControlNewProject = {
+  id: string
+  reference: string
+  projectName: string
+  developerName: string | null
+  startPrice: number | null
+  endPrice: number | null
+  images: string[]
+  video: string | null
+  description: string
+  cityId: string | null
+  countryId: string | null
+  publicAddressLabel: string | null
+  publicMapLocation: string | null
+  userId: string | null
+  phone: string | null
+  address: string | null
+  mapLocation: string | null
+  status: NewProjectStatus
+  createdAt: string
+  updatedAt: string
+}
+
+export type NewProjectFilters = {
+  status?: NewProjectStatus
+  country?: string
+  city?: string
+  developer?: string
+  keyword?: string
+  minPrice?: string
+  maxPrice?: string
+}
+
+export type NewProjectPayload = {
+  id?: string
+  projectName: string
+  developerName?: string | null
+  startPrice?: number | null
+  endPrice?: number | null
+  images: string[]
+  video?: string | null
+  description: string
+  mapLocation?: string | null
+  phone?: string | null
+  address?: string | null
+  cityId?: string | null
+  countryId?: string | null
+  status?: NewProjectStatus
+}
+
+function nullableText(value: unknown) {
+  return text(value) || null
+}
+
+function nullableNumber(value: unknown) {
+  if (value === null || value === undefined || value === '') return null
+  const number = Number(value)
+  return Number.isFinite(number) ? number : null
+}
+
+function imagesValue(value: unknown) {
+  if (Array.isArray(value)) return value.map((item) => text(item)).filter(Boolean)
+  if (typeof value === 'string' && value.trim()) {
+    try {
+      const parsed: unknown = JSON.parse(value)
+      if (Array.isArray(parsed)) return parsed.map((item) => text(item)).filter(Boolean)
+    } catch {
+      return value.split(',').map((item) => item.trim()).filter(Boolean)
+    }
+  }
+  return []
+}
+
+function projectStatus(value: unknown): NewProjectStatus {
+  const raw = text(value)
+  return raw === 'published' || raw === 'archived' ? raw : 'draft'
+}
+
+export function normalizeNewProject(raw: Record<string, unknown>): ControlNewProject {
+  return {
+    id: text(raw.id),
+    reference: text(raw.reference),
+    projectName: text(raw.projectName ?? raw.project_name, 'Untitled project'),
+    developerName: nullableText(raw.developerName ?? raw.developer_name),
+    startPrice: nullableNumber(raw.startPrice ?? raw.start_price),
+    endPrice: nullableNumber(raw.endPrice ?? raw.end_price),
+    images: imagesValue(raw.images),
+    video: nullableText(raw.video),
+    description: text(raw.description),
+    cityId: nullableText(raw.cityId ?? raw.city_id),
+    countryId: nullableText(raw.countryId ?? raw.country_id),
+    publicAddressLabel: nullableText(raw.publicAddressLabel ?? raw.public_address_label),
+    publicMapLocation: nullableText(raw.publicMapLocation ?? raw.public_map_location),
+    userId: nullableText(raw.userId ?? raw.user_id),
+    phone: nullableText(raw.phone),
+    address: nullableText(raw.address),
+    mapLocation: nullableText(raw.mapLocation ?? raw.map_location),
+    status: projectStatus(raw.status),
+    createdAt: text(raw.createdAt ?? raw.created_at),
+    updatedAt: text(raw.updatedAt ?? raw.updated_at)
+  }
+}
+
+export async function getNewProjectSummary() {
+  const body = await controlFetch<{ ok: true; summary: Record<NewProjectStatus, number> }>('/api/admin/new-projects/summary')
+  return { draft: body.summary.draft || 0, published: body.summary.published || 0, archived: body.summary.archived || 0 }
+}
+
+export async function getNewProjects(filters: NewProjectFilters = {}) {
+  const params = new URLSearchParams()
+  if (filters.status) params.set('status', filters.status)
+  if (filters.country) params.set('country', filters.country)
+  if (filters.city) params.set('city', filters.city)
+  if (filters.developer) params.set('developer', filters.developer)
+  if (filters.keyword) params.set('keyword', filters.keyword)
+  if (filters.minPrice) params.set('min_price', filters.minPrice)
+  if (filters.maxPrice) params.set('max_price', filters.maxPrice)
+  const query = params.toString()
+  const body = await controlFetch<{ ok: true; projects: Array<Record<string, unknown>> }>(`/api/admin/new-projects${query ? `?${query}` : ''}`)
+  return body.projects.map(normalizeNewProject).filter((project) => project.id)
+}
+
+export async function getNewProject(id: string) {
+  const body = await controlFetch<{ ok: true; project: Record<string, unknown> }>(`/api/admin/new-projects/${encodeURIComponent(id)}`)
+  return normalizeNewProject(body.project)
+}
+
+export async function saveNewProject(input: NewProjectPayload) {
+  const payload = {
+    projectName: input.projectName,
+    developerName: input.developerName,
+    startPrice: input.startPrice,
+    endPrice: input.endPrice,
+    images: input.images,
+    video: input.video,
+    description: input.description,
+    mapLocation: input.mapLocation,
+    phone: input.phone,
+    address: input.address,
+    cityId: input.cityId,
+    countryId: input.countryId,
+    status: input.status
+  }
+  const path = input.id ? `/api/admin/new-projects/${encodeURIComponent(input.id)}` : '/api/admin/new-projects'
+  const body = await controlFetch<{ ok: true; project: Record<string, unknown> }>(path, {
+    method: input.id ? 'PATCH' : 'POST',
+    body: JSON.stringify(payload)
+  })
+  return normalizeNewProject(body.project)
+}
+
+export async function setNewProjectStatus(id: string, status: NewProjectStatus) {
+  const body = await controlFetch<{ ok: true; project: Record<string, unknown> }>(`/api/admin/new-projects/${encodeURIComponent(id)}/status`, {
+    method: 'PATCH',
+    body: JSON.stringify({ status })
+  })
+  return normalizeNewProject(body.project)
+}
+
+export async function archiveNewProject(id: string) {
+  const body = await controlFetch<{ ok: true; project: Record<string, unknown> }>(`/api/admin/new-projects/${encodeURIComponent(id)}`, { method: 'DELETE' })
+  return normalizeNewProject(body.project)
+}

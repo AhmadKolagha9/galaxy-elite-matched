@@ -5,7 +5,8 @@ const standardLinks = [
   { href: '/', label: 'Overview' },
   { href: '/submissions', label: 'Submissions' },
   { href: '/documents', label: 'Documents' },
-  { href: '/matches', label: 'Matches' }
+  { href: '/matches', label: 'Matches' },
+  { href: '/new-projects', label: 'New Projects' }
 ]
 
 const superAdminLinks = [

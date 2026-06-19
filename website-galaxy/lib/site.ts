@@ -18,6 +18,7 @@ export const mainNav = [
   { href: '/private-club', label: 'Private Club' },
   { href: '/interest-board', label: 'Interest Board' },
   { href: '/private-opportunities', label: 'Private Opportunities' },
+  { href: '/new-projects', label: 'New Projects' },
   { href: '/market-pulse', label: 'Market Pulse' },
   { href: '/submit', label: 'Submit' }
 ]
